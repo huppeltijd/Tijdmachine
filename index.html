@@ -723,7 +723,7 @@
           <circle cx="15" cy="15" r="2" fill="#3a2410"/>
           <line x1="15" y1="15" x2="22" y2="9" stroke="#3a2410" stroke-width="2"/>
         </svg>
-        Foto <span id="photo-num">1</span> / 30
+        Foto <span id="photo-num">1</span> / <span id="photo-total">30</span>
       </div>
       <div class="pill timer">
         <!-- klok-icoon -->
@@ -805,6 +805,12 @@
 // ============================================================
 //  CONFIGURATIE
 // ============================================================
+
+//  Hoeveel foto's per ronde?
+//  - Zet op 0 om alle foto's uit photos.js te gebruiken.
+//  - Zet op bv. 10 om tijdelijk maar 10 foto's te spelen (willekeurig gekozen
+//    uit de hele lijst). Handig om uit te testen.
+const NUM_PHOTOS = 0;
 
 //  Gedeeld scorebord via Firebase Realtime Database.
 //  - Laat leeg ("") om scores lokaal in de browser op te slaan.
@@ -967,7 +973,7 @@ function check() {
 
 function nextPhoto() {
   state.current++;
-  if (state.current >= PHOTOS.length) finish();
+  if (state.current >= state.order.length) finish();
   else showPhoto();
 }
 
@@ -996,8 +1002,11 @@ function startGame() {
     alert("photos.js is niet correct geladen of bevat te weinig foto's.");
     return;
   }
-  state.order = shuffle(window.PHOTOS.map((_, i) => i));
+  const requested = Number(NUM_PHOTOS) > 0 ? Number(NUM_PHOTOS) : window.PHOTOS.length;
+  const count = Math.min(requested, window.PHOTOS.length);
+  state.order = shuffle(window.PHOTOS.map((_, i) => i)).slice(0, count);
   state.current = 0;
+  $("#photo-total").textContent = String(count);
   show("#screen-game");
   showPhoto();
   startTimer();
