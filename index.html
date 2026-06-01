@@ -217,7 +217,7 @@
       font-variant: small-caps;
       letter-spacing: .2em;
       color: var(--brass);
-      font-size: 18px;
+      font-size: 14px;
       text-align: right;
       text-shadow: 0 1px 0 #000;
     }
@@ -808,8 +808,9 @@
 
 //  Hoeveel foto's per ronde?
 //  - Zet op 0 om alle foto's uit photos.js te gebruiken.
-//  - Zet op bv. 10 om tijdelijk maar 10 foto's te spelen (willekeurig gekozen
-//    uit de hele lijst). Handig om uit te testen.
+//  - Zet op bv. 10 om enkel de EERSTE 10 foto's te spelen. Handig om al te
+//    kunnen testen terwijl je foto 11..30 nog niet ingevuld hebt.
+//    De volgorde wordt nog wel geschud binnen die eerste 10.
 const NUM_PHOTOS = 0;
 
 //  Gedeeld scorebord via Firebase Realtime Database.
@@ -883,9 +884,14 @@ function placeholderSvg(num) {
 //  RONDE OPBOUWEN
 // ============================================================
 function buildOptions(field, correct) {
-  const allValues = [...new Set(PHOTOS.map(p => p[field]))];
+  // pool = enkel de foto's die in deze ronde meedoen (state.order)
+  const inRound = state.order.map(i => PHOTOS[i][field]);
+  const allValues = [...new Set(inRound)];
   const pool = allValues.filter(v => v !== correct);
   const wrong = shuffle(pool).slice(0, 2);
+  // als er minder dan 2 alternatieven zijn (heel kleine subset), vul aan met
+  // dummy-waarden zodat er toch 3 keuzes verschijnen
+  while (wrong.length < 2) wrong.push("—");
   return shuffle([correct, ...wrong]);
 }
 
@@ -1004,7 +1010,9 @@ function startGame() {
   }
   const requested = Number(NUM_PHOTOS) > 0 ? Number(NUM_PHOTOS) : window.PHOTOS.length;
   const count = Math.min(requested, window.PHOTOS.length);
-  state.order = shuffle(window.PHOTOS.map((_, i) => i)).slice(0, count);
+  // neem eerst de EERSTE `count` foto's en schud dan binnen die subset
+  const indices = window.PHOTOS.map((_, i) => i).slice(0, count);
+  state.order = shuffle(indices);
   state.current = 0;
   $("#photo-total").textContent = String(count);
   show("#screen-game");
