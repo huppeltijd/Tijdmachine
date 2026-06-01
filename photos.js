@@ -23,7 +23,7 @@
 // ============================================================
 
 window.PHOTOS = [
-  { url: "images/HPP2023.jpg", theme: "Maanlanding",                  year: 1969, place: "Maan" },
+  { url: "https://github.com/huppeltijd/Tijdmachine/blob/main/images/HPP2023.jpg", theme: "Maanlanding",                  year: 1969, place: "Maan" },
   { url: "", theme: "Val van de Berlijnse Muur",    year: 1989, place: "Berlijn" },
   { url: "", theme: "Atoombom op Hiroshima",        year: 1945, place: "Hiroshima" },
   { url: "", theme: "Eerste vlucht Wright Brothers",year: 1903, place: "Kitty Hawk" },
