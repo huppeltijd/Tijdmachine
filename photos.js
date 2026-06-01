@@ -24,7 +24,7 @@
 
 window.PHOTOS = [
   { url: "images/HPP2024.jpg"", theme: "Terug naar jezelf",                  year: 2024, place: "Harzé" },
-  { url: "", theme: "Val van de Berlijnse Muur",    year: 1989, place: "Berlijn" },
+  { url: "", theme: "HPP detectives",    year: 2023, place: "Lokeren" },
   { url: "", theme: "Atoombom op Hiroshima",        year: 1945, place: "Hiroshima" },
   { url: "", theme: "Eerste vlucht Wright Brothers",year: 1903, place: "Kitty Hawk" },
   { url: "", theme: "Aanslag op de Twin Towers",    year: 2001, place: "New York" },
