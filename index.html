@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>De Teletijdmachine</title>
+  <title>De HuPPelTijd-machine</title>
   <style>
     /* ============================================================
        KLEURPALET  (steampunk · brass + teal)
@@ -525,7 +525,7 @@
   <!-- ============ START ============ -->
   <section id="screen-start">
     <h1>De Teletijdmachine</h1>
-    <p class="subtitle">Reis door dertig momenten in de tijd. Wie raadt ze het snelst?</p>
+    <p class="subtitle">Reis door dertig jaar Huppelepup-topmomenten in de tijd. Wie raadt ze het snelst?</p>
 
     <!-- ===== HERO: animated time machine ===== -->
     <div class="machine-wrap">
@@ -709,7 +709,7 @@
       <span class="rivet-bl"></span><span class="rivet-br"></span>
     </div>
 
-    <h2 class="center mt">Top 10 snelste tijden</h2>
+    <h2 class="center mt">Top 20 snelste tijden</h2>
     <ol class="board" id="board-start"><li class="empty">Scorebord laden…</li></ol>
   </section>
 
@@ -795,7 +795,7 @@
   </section>
 
   <p class="center small mt" style="margin-top:48px; opacity:.6;">
-    Een Teletijdmachine-spel · pas <code>photos.js</code> aan om foto's te vervangen
+    Een HuPPelTijd-spel 2026
   </p>
 </div>
 
@@ -811,7 +811,7 @@
 //  - Zet op bv. 10 om enkel de EERSTE 10 foto's te spelen. Handig om al te
 //    kunnen testen terwijl je foto 11..30 nog niet ingevuld hebt.
 //    De volgorde wordt nog wel geschud binnen die eerste 10.
-const NUM_PHOTOS = 3;
+const NUM_PHOTOS = 10;
 
 //  Gedeeld scorebord via Firebase Realtime Database.
 //  - Laat leeg ("") om scores lokaal in de browser op te slaan.
@@ -1088,7 +1088,7 @@ async function renderBoard(selector, highlight) {
   const top = all
     .filter(s => s && typeof s.ms === "number" && s.name)
     .sort((a, b) => a.ms - b.ms)
-    .slice(0, 10);
+    .slice(0, 20);
   const ol = $(selector);
   ol.innerHTML = "";
   if (top.length === 0) {
