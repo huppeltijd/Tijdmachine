@@ -32,7 +32,7 @@ window.PHOTOS = [
   { url: "./images/HPP2017.jpg", theme: "Hoofddeksel/Pijl&Boog",                 year: 2017, place: "Zelem" },
   { url: "./images/HPP2016.jpg", theme: "Back to Base Camp",   year: 2016, place: "Purnode Tent" },
   { url: "./images/HPP2015.jpg", theme: "Zeebonken",        year: 2015, place: "Broedertrouw Nederland" },
-  { url: "./images/HPP2019.jpg", theme: "Nostalgie",                year: 2019, place: "Koersel Fonteintje" },
+  { url: "./images/HPP2014.jpg", theme: "Nostalgie",                year: 2019, place: "Koersel Fonteintje" },
   { url: "./images/HPP2013.jpg", theme: "Extreme Outdoor",        year: 2013, place: "Grot Vechmaal & Tent Sy" },
   { url: "./images/HPP2012.jpg", theme: "HPP Travel",          year: 2012, place: "Sint Pieters Voeren" },
   { url: "", theme: "Ondergang van de Titanic",     year: 1912, place: "Atlantische Oceaan" },
