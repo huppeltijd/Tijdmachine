@@ -23,8 +23,8 @@
 // ============================================================
 
 window.PHOTOS = [
-  { url: "images/HPP2024.jpg"", theme: "Terug naar jezelf",                  year: 2024, place: "Harzé" },
-  { url: "", theme: "HPP detectives",    year: 2023, place: "Lokeren" },
+  { url: "images/HPP2024.png"", theme: "Terug naar jezelf",                  year: 2024, place: "Harzé" },
+  { url: "images/HPP2023.png", theme: "HPP detectives",    year: 2023, place: "Lokeren" },
   { url: "", theme: "Atoombom op Hiroshima",        year: 1945, place: "Hiroshima" },
   { url: "", theme: "Eerste vlucht Wright Brothers",year: 1903, place: "Kitty Hawk" },
   { url: "", theme: "Aanslag op de Twin Towers",    year: 2001, place: "New York" },
