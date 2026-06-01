@@ -23,7 +23,7 @@
 // ============================================================
 
 window.PHOTOS = [
-  { url: "images/HPP2023", theme: "Terug naar jezelf",                  year: 2024, place: "Harzé" },
+  { url: "images/HPP2023.jpg", theme: "Terug naar jezelf",                  year: 2024, place: "Harzé" },
   { url: "", theme: "Val van de Berlijnse Muur",    year: 1989, place: "Berlijn" },
   { url: "", theme: "Atoombom op Hiroshima",        year: 1945, place: "Hiroshima" },
   { url: "", theme: "Eerste vlucht Wright Brothers",year: 1903, place: "Kitty Hawk" },
