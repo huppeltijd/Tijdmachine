@@ -25,7 +25,7 @@
 window.PHOTOS = [
   { url: "./images/HPP2024.png", theme: "Terug naar jezelf",                  year: 2024, place: "Harzé" },
   { url: "./images/HPP2023.jpg", theme: "HPP Detectives",    year: 2023, place: "Lokeren" },
-  { url: "./images/HPP2021.jgg", theme: "Hotel Plezante Paljas",        year: 2012, place: "Bleialf" },
+  { url: "./images/HPP2021.jgg", theme: "Hotel Plezante Paljas",        year: 2021, place: "Bleialf" },
   { url: "", theme: "Eerste vlucht Wright Brothers",year: 1903, place: "Kitty Hawk" },
   { url: "", theme: "Aanslag op de Twin Towers",    year: 2001, place: "New York" },
   { url: "", theme: "Kroning van Elizabeth II",     year: 1953, place: "Londen" },
