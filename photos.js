@@ -17,7 +17,6 @@ window.PHOTOS = [
   { photos: ["./images/2023/1.jpg", "./images/2023/2.jpg", "./images/2023/3.jpg"], theme: "HPP Detectives", year: 2023, place: "Lokeren" },
   { photos: ["./images/2022/1.jpg", "./images/2022/2.jpg", "./images/2022/3.jpg"], theme: "HPP The Oscars", year: 2022, place: "Dilsen Stokkem" },
   { photos: ["./images/2021/1.jpg", "./images/2021/2.jpg", "./images/2021/3.jpg"], theme: "Hotel Plezante Paljas", year: 2021, place: "Bleialf" },
-  { photos: ["./images/2020/1.jpg", "./images/2020/2.jpg", "./images/2020/3.jpg"], theme: "HPP 2020", year: 2020, place: "Vul plaats in" },
   { photos: ["./images/2019/1.jpg", "./images/2019/2.jpg", "./images/2019/3.jpg"], theme: "Waardig oud worden", year: 2019, place: "As" },
   { photos: ["./images/2018/1.jpg", "./images/2018/2.jpg", "./images/2018/3.jpg"], theme: "Hill Billy's", year: 2018, place: "Boutershof" },
   { photos: ["./images/2017/1.jpg", "./images/2017/2.jpg", "./images/2017/3.jpg"], theme: "Hoofddeksel/Pijl&Boog", year: 2017, place: "Zelem" },
