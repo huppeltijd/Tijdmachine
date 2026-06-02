@@ -737,8 +737,8 @@
 
     <div class="plaque">
       <p>Bij elke foto kies je het juiste <b>thema</b>, <b>jaartal</b> en de juiste <b>plaats</b>.
-        Heb je alle drie juist, dan kom je een foto verder. De klok tikt door.
-        Na dertig foto's vul je je voornaam in en kom je op het scorebord.</p>
+        Heb je alle drie juist, dan reis je verder door de HuPPelTijd-geschiedenis". De klok tikt door.
+        Na 10 juiste foto's finish je en kom je misschien op het scorebord. Als je op tijd bent...</p>
       <p class="small">De foto's én de antwoordopties worden bij elke nieuwe ronde door elkaar geschud.</p>
       <div class="actions">
         <button class="btn" id="btn-start">Start de tijdreis</button>
@@ -801,7 +801,7 @@
   <!-- ============ FINISH ============ -->
   <section id="screen-finish" hidden>
     <h1>Volbracht!</h1>
-    <p class="subtitle">Je hebt alle dertig momenten ontsloten.</p>
+    <p class="subtitle">Je hebt alle tien momenten ontsloten.</p>
     <div class="plaque center">
       <p>Eindtijd</p>
       <div class="pill timer" style="display:inline-block; font-size:30px; padding-left:54px;">
@@ -848,7 +848,7 @@
 //  - Zet op bv. 10 om enkel de EERSTE 10 foto's te spelen. Handig om al te
 //    kunnen testen terwijl je foto 11..30 nog niet ingevuld hebt.
 //    De volgorde wordt nog wel geschud binnen die eerste 10.
-const NUM_PHOTOS = 18;
+const NUM_PHOTOS = 10;
 
 //  Gedeeld scorebord via Firebase Realtime Database.
 //  - Laat leeg ("") om scores lokaal in de browser op te slaan.
@@ -1052,11 +1052,20 @@ function startGame() {
     alert("photos.js is niet correct geladen of bevat te weinig foto's.");
     return;
   }
-  const requested = Number(NUM_PHOTOS) > 0 ? Number(NUM_PHOTOS) : window.PHOTOS.length;
-  const count = Math.min(requested, window.PHOTOS.length);
-  // neem eerst de EERSTE `count` foto's en schud dan binnen die subset
-  const indices = window.PHOTOS.map((_, i) => i).slice(0, count);
-  state.order = shuffle(indices);
+const requested = Number(NUM_PHOTOS) > 0
+  ? Number(NUM_PHOTOS)
+  : window.PHOTOS.length;
+
+const count = Math.min(requested, window.PHOTOS.length);
+
+// alle beschikbare jaren
+const allIndices = window.PHOTOS.map((_, i) => i);
+
+// eerst alle jaren schudden
+const randomYears = shuffle(allIndices);
+
+// daarna slechts count jaren nemen
+state.order = randomYears.slice(0, count);
   state.current = 0;
   $("#photo-total").textContent = String(count);
   show("#screen-game");
