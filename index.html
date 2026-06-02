@@ -811,7 +811,7 @@
 //  - Zet op bv. 10 om enkel de EERSTE 10 foto's te spelen. Handig om al te
 //    kunnen testen terwijl je foto 11..30 nog niet ingevuld hebt.
 //    De volgorde wordt nog wel geschud binnen die eerste 10.
-const NUM_PHOTOS = 12;
+const NUM_PHOTOS = 5;
 
 //  Gedeeld scorebord via Firebase Realtime Database.
 //  - Laat leeg ("") om scores lokaal in de browser op te slaan.
@@ -914,15 +914,22 @@ function renderRow(field, options, selected) {
     wrap.appendChild(btn);
   }
 }
-
+function pickPhotoUrl(photo) {
+  if (Array.isArray(photo.photos) && photo.photos.length > 0) {
+    return shuffle(photo.photos).find(u => u && u.trim()) || "";
+  }
+  return photo.url || "";
+}
 function showPhoto() {
   const photo = PHOTOS[state.order[state.current]];
   const slot = $("#photo-slot");
-  if (photo.url && photo.url.trim()) {
-    slot.innerHTML = `<img src="${photo.url}" alt="Historische foto ${state.current + 1}">`;
-  } else {
-    slot.innerHTML = placeholderSvg(state.current + 1);
-  }
+ const url = pickPhotoUrl(photo);
+
+if (url && url.trim()) {
+  slot.innerHTML = `<img src="${url}" alt="Foto ${photo.year} - ${photo.theme}">`;
+} else {
+  slot.innerHTML = placeholderSvg(state.current + 1);
+}
 
   photo._opts = {
     theme: buildOptions("theme", photo.theme),
