@@ -1,56 +1,42 @@
 // ============================================================
-//  TELETIJDMACHINE - 30 foto's
-// ============================================================
-//  Vervang de tekst en (later) de afbeeldingen door je eigen
-//  selectie. Eén entry per foto:
-//
-//   {
-//     "url":   "https://...",   // (optioneel) URL naar de foto
-//                               //   leeg laten => placeholder met de info
-//     "theme": "Maanlanding",   // het juiste thema
-//     "year":  1969,            // het juiste jaartal (getal)
-//     "place": "Maan"           // de juiste plaatsnaam
-//   }
-//
-//  De fout antwoorden in het spel worden automatisch gekozen
-//  uit de andere 29 foto's, dus je hoeft die niet zelf in
-//  te vullen. Bij elke nieuwe ronde worden ze opnieuw door
-//  elkaar geschud.
-//
-//  Tip: zorg dat de 30 thema's, jaartallen en plaatsen voldoende
-//  verschillen, zodat de fout antwoorden er anders uitzien dan
-//  het juiste.
+//  HuPPelTijdmachine - foto's per jaartal
+//  Structuur per map:
+//  images/2026/1.jpg
+//  images/2026/2.jpg
+//  images/2026/3.jpg
 // ============================================================
 
 window.PHOTOS = [
-  { url: "./images/HPP2024.jpg", theme: "Terug naar jezelf",                  year: 2024, place: "Harzé" },
-  { url: "./images/HPP2023.jpg", theme: "HPP Detectives",    year: 2023, place: "Lokeren" },
-  { url: "./images/HPP2021.jpg", theme: "Hotel Plezante Paljas",        year: 2021, place: "Bleialf" },
-  { url: "./images/HPP2022.jpg", theme: "HPP The Oscars",year: 2022, place: "Dilsen Stokkem" },
-  { url: "./images/HPP2019.jpg", theme: "Waardig oud worden",    year: 2019, place: "As" },
-  { url: "./images/HPP2018.jpg", theme: "Hill Billy's",     year: 2018, place: "Boutershof" },
-  { url: "./images/HPP2017.jpg", theme: "Hoofddeksel/Pijl&Boog",                 year: 2017, place: "Zelem" },
-  { url: "./images/HPP2016.jpg", theme: "Back to Base Camp",   year: 2016, place: "Purnode Tent" },
-  { url: "./images/HPP2015.jpg", theme: "Zeebonken",        year: 2015, place: "Broedertrouw Nederland" },
-  { url: "./images/HPP2014.jpg", theme: "Nostalgie",                year: 2014, place: "Koersel Fonteintje" },
-  { url: "./images/HPP2013.jpg", theme: "Extreme Outdoor",        year: 2013, place: "Grot Vechmaal & Tent Sy" },
-  { url: "./images/HPP2012.jpg", theme: "HPP Travel",          year: 2012, place: "Sint Pieters Voeren" },
-  { url: "", theme: "Ondergang van de Titanic",     year: 1912, place: "Atlantische Oceaan" },
-  { url: "", theme: "Beatles bij Ed Sullivan",      year: 1964, place: "New York" },
-  { url: "", theme: "Vrijlating van Mandela",       year: 1990, place: "Kaapstad" },
-  { url: "", theme: "Olympische Spelen Berlijn",    year: 1936, place: "Berlijn" },
-  { url: "", theme: "Russische Revolutie",          year: 1917, place: "Sint-Petersburg" },
-  { url: "", theme: "Verdrag van Maastricht",       year: 1992, place: "Maastricht" },
-  { url: "", theme: "Hindenburg-explosie",          year: 1937, place: "Lakehurst" },
-  { url: "", theme: "Woodstock-festival",           year: 1969, place: "Bethel" },
-  { url: "", theme: "Eerste iPhone gepresenteerd",  year: 2007, place: "San Francisco" },
-  { url: "", theme: "Val van Saigon",               year: 1975, place: "Saigon" },
-  { url: "", theme: "Eerste harttransplantatie",    year: 1967, place: "Kaapstad" },
-  { url: "", theme: "Geboorte van het internet",    year: 1969, place: "Los Angeles" },
-  { url: "", theme: "Eerste Tour de France",        year: 1903, place: "Parijs" },
-  { url: "", theme: "Olympische Spelen Antwerpen",  year: 1920, place: "Antwerpen" },
-  { url: "", theme: "WK-duel België - Brazilië",    year: 2018, place: "Kazan" },
-  { url: "", theme: "Brexit-referendum",            year: 2016, place: "Londen" },
-  { url: "", theme: "Uitbraak van COVID-19",        year: 2020, place: "Wuhan" },
-  { url: "", theme: "Bevrijding van Auschwitz",     year: 1945, place: "Oświęcim" },
+  { photos: ["./images/2026/1.jpg", "./images/2026/2.jpg", "./images/2026/3.jpg"], theme: "HPP 2026", year: 2026, place: "Vul plaats in" },
+  { photos: ["./images/2025/1.jpg", "./images/2025/2.jpg", "./images/2025/3.jpg"], theme: "HPP 2025", year: 2025, place: "Vul plaats in" },
+  { photos: ["./images/2024/1.jpg", "./images/2024/2.jpg", "./images/2024/3.jpg"], theme: "Terug naar jezelf", year: 2024, place: "Harzé" },
+  { photos: ["./images/2023/1.jpg", "./images/2023/2.jpg", "./images/2023/3.jpg"], theme: "HPP Detectives", year: 2023, place: "Lokeren" },
+  { photos: ["./images/2022/1.jpg", "./images/2022/2.jpg", "./images/2022/3.jpg"], theme: "HPP The Oscars", year: 2022, place: "Dilsen Stokkem" },
+  { photos: ["./images/2021/1.jpg", "./images/2021/2.jpg", "./images/2021/3.jpg"], theme: "Hotel Plezante Paljas", year: 2021, place: "Bleialf" },
+  { photos: ["./images/2020/1.jpg", "./images/2020/2.jpg", "./images/2020/3.jpg"], theme: "HPP 2020", year: 2020, place: "Vul plaats in" },
+  { photos: ["./images/2019/1.jpg", "./images/2019/2.jpg", "./images/2019/3.jpg"], theme: "Waardig oud worden", year: 2019, place: "As" },
+  { photos: ["./images/2018/1.jpg", "./images/2018/2.jpg", "./images/2018/3.jpg"], theme: "Hill Billy's", year: 2018, place: "Boutershof" },
+  { photos: ["./images/2017/1.jpg", "./images/2017/2.jpg", "./images/2017/3.jpg"], theme: "Hoofddeksel/Pijl&Boog", year: 2017, place: "Zelem" },
+  { photos: ["./images/2016/1.jpg", "./images/2016/2.jpg", "./images/2016/3.jpg"], theme: "Back to Base Camp", year: 2016, place: "Purnode Tent" },
+  { photos: ["./images/2015/1.jpg", "./images/2015/2.jpg", "./images/2015/3.jpg"], theme: "Zeebonken", year: 2015, place: "Broedertrouw Nederland" },
+  { photos: ["./images/2014/1.jpg", "./images/2014/2.jpg", "./images/2014/3.jpg"], theme: "Nostalgie", year: 2014, place: "Koersel Fonteintje" },
+  { photos: ["./images/2013/1.jpg", "./images/2013/2.jpg", "./images/2013/3.jpg"], theme: "Extreme Outdoor", year: 2013, place: "Grot Vechmaal & Tent Sy" },
+  { photos: ["./images/2012/1.jpg", "./images/2012/2.jpg", "./images/2012/3.jpg"], theme: "HPP Travel", year: 2012, place: "Sint Pieters Voeren" },
+
+  { photos: ["./images/2011/1.jpg", "./images/2011/2.jpg", "./images/2011/3.jpg"], theme: "HPP 2011", year: 2011, place: "Vul plaats in" },
+  { photos: ["./images/2010/1.jpg", "./images/2010/2.jpg", "./images/2010/3.jpg"], theme: "HPP 2010", year: 2010, place: "Vul plaats in" },
+  { photos: ["./images/2009/1.jpg", "./images/2009/2.jpg", "./images/2009/3.jpg"], theme: "HPP 2009", year: 2009, place: "Vul plaats in" },
+  { photos: ["./images/2008/1.jpg", "./images/2008/2.jpg", "./images/2008/3.jpg"], theme: "HPP 2008", year: 2008, place: "Vul plaats in" },
+  { photos: ["./images/2007/1.jpg", "./images/2007/2.jpg", "./images/2007/3.jpg"], theme: "HPP 2007", year: 2007, place: "Vul plaats in" },
+  { photos: ["./images/2006/1.jpg", "./images/2006/2.jpg", "./images/2006/3.jpg"], theme: "HPP 2006", year: 2006, place: "Vul plaats in" },
+  { photos: ["./images/2005/1.jpg", "./images/2005/2.jpg", "./images/2005/3.jpg"], theme: "HPP 2005", year: 2005, place: "Vul plaats in" },
+  { photos: ["./images/2004/1.jpg", "./images/2004/2.jpg", "./images/2004/3.jpg"], theme: "HPP 2004", year: 2004, place: "Vul plaats in" },
+  { photos: ["./images/2003/1.jpg", "./images/2003/2.jpg", "./images/2003/3.jpg"], theme: "HPP 2003", year: 2003, place: "Vul plaats in" },
+  { photos: ["./images/2002/1.jpg", "./images/2002/2.jpg", "./images/2002/3.jpg"], theme: "HPP 2002", year: 2002, place: "Vul plaats in" },
+  { photos: ["./images/2001/1.jpg", "./images/2001/2.jpg", "./images/2001/3.jpg"], theme: "HPP 2001", year: 2001, place: "Vul plaats in" },
+  { photos: ["./images/2000/1.jpg", "./images/2000/2.jpg", "./images/2000/3.jpg"], theme: "HPP 2000", year: 2000, place: "Vul plaats in" },
+  { photos: ["./images/1999/1.jpg", "./images/1999/2.jpg", "./images/1999/3.jpg"], theme: "HPP 1999", year: 1999, place: "Vul plaats in" },
+  { photos: ["./images/1998/1.jpg", "./images/1998/2.jpg", "./images/1998/3.jpg"], theme: "HPP 1998", year: 1998, place: "Vul plaats in" },
+  { photos: ["./images/1997/1.jpg", "./images/1997/2.jpg", "./images/1997/3.jpg"], theme: "JAMBERS FILM", year: 1997, place: "La Reid" },
+  { photos: ["./images/1996/1.jpg", "./images/1996/2.jpg", "./images/1996/3.jpg"], theme: "TV-SHOWS", year: 1996, place: "Purnode" },
 ];
