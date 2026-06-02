@@ -25,19 +25,7 @@ window.PHOTOS = [
   { photos: ["./images/2014/1.jpg", "./images/2014/2.jpg", "./images/2014/3.jpg"], theme: "Nostalgie", year: 2014, place: "Koersel Fonteintje" },
   { photos: ["./images/2013/1.jpg", "./images/2013/2.jpg", "./images/2013/3.jpg"], theme: "Extreme Outdoor", year: 2013, place: "Grot Vechmaal & Tent Sy" },
   { photos: ["./images/2012/1.jpg", "./images/2012/2.jpg", "./images/2012/3.jpg"], theme: "HPP Travel", year: 2012, place: "Sint Pieters Voeren" },
-  { photos: ["./images/2011/1.jpg", "./images/2011/2.jpg", "./images/2011/3.jpg"], theme: "HPP 2011", year: 2011, place: "Vul plaats in" },
-  { photos: ["./images/2010/1.jpg", "./images/2010/2.jpg", "./images/2010/3.jpg"], theme: "HPP 2010", year: 2010, place: "Vul plaats in" },
-  { photos: ["./images/2009/1.jpg", "./images/2009/2.jpg", "./images/2009/3.jpg"], theme: "HPP 2009", year: 2009, place: "Vul plaats in" },
-  { photos: ["./images/2008/1.jpg", "./images/2008/2.jpg", "./images/2008/3.jpg"], theme: "HPP 2008", year: 2008, place: "Vul plaats in" },
-  { photos: ["./images/2007/1.jpg", "./images/2007/2.jpg", "./images/2007/3.jpg"], theme: "HPP 2007", year: 2007, place: "Vul plaats in" },
-  { photos: ["./images/2006/1.jpg", "./images/2006/2.jpg", "./images/2006/3.jpg"], theme: "HPP 2006", year: 2006, place: "Vul plaats in" },
-  { photos: ["./images/2005/1.jpg", "./images/2005/2.jpg", "./images/2005/3.jpg"], theme: "HPP 2005", year: 2005, place: "Vul plaats in" },
-  { photos: ["./images/2004/1.jpg", "./images/2004/2.jpg", "./images/2004/3.jpg"], theme: "HPP 2004", year: 2004, place: "Vul plaats in" },
-  { photos: ["./images/2003/1.jpg", "./images/2003/2.jpg", "./images/2003/3.jpg"], theme: "HPP 2003", year: 2003, place: "Vul plaats in" },
-  { photos: ["./images/2002/1.jpg", "./images/2002/2.jpg", "./images/2002/3.jpg"], theme: "HPP 2002", year: 2002, place: "Vul plaats in" },
-  { photos: ["./images/2001/1.jpg", "./images/2001/2.jpg", "./images/2001/3.jpg"], theme: "HPP 2001", year: 2001, place: "Vul plaats in" },
-    { photos: ["./images/2026/1.jpg", "./images/2026/2.jpg", "./images/2026/3.jpg"], theme: "HPP 2026", year: 2026, place: "Vul plaats in" },
-  { photos: ["./images/2025/1.jpg", "./images/2025/2.jpg", "./images/2025/3.jpg"], theme: "HPP 2025", year: 2025, place: "Vul plaats in" },
+
 
   
 ];
