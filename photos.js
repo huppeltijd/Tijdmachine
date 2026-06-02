@@ -12,8 +12,7 @@ window.PHOTOS = [
   { photos: ["./images/1998/1.jpg", "./images/1998/2.jpg", "./images/1998/3.jpg"], theme: "De Remork", year: 1998, place: "Thuin" },
   { photos: ["./images/1997/1.jpg", "./images/1997/2.jpg", "./images/1997/3.jpg"], theme: "Jambers Film", year: 1997, place: "La Reid" },
   { photos: ["./images/1996/1.jpg", "./images/1996/2.jpg", "./images/1996/3.jpg"], theme: "TV-Shows", year: 1996, place: "Purnode" },
-  { photos: ["./images/2026/1.jpg", "./images/2026/2.jpg", "./images/2026/3.jpg"], theme: "HPP 2026", year: 2026, place: "Vul plaats in" },
-  { photos: ["./images/2025/1.jpg", "./images/2025/2.jpg", "./images/2025/3.jpg"], theme: "HPP 2025", year: 2025, place: "Vul plaats in" },
+
   { photos: ["./images/2024/1.jpg", "./images/2024/2.jpg", "./images/2024/3.jpg"], theme: "Terug naar jezelf", year: 2024, place: "Harzé" },
   { photos: ["./images/2023/1.jpg", "./images/2023/2.jpg", "./images/2023/3.jpg"], theme: "HPP Detectives", year: 2023, place: "Lokeren" },
   { photos: ["./images/2022/1.jpg", "./images/2022/2.jpg", "./images/2022/3.jpg"], theme: "HPP The Oscars", year: 2022, place: "Dilsen Stokkem" },
@@ -38,6 +37,8 @@ window.PHOTOS = [
   { photos: ["./images/2003/1.jpg", "./images/2003/2.jpg", "./images/2003/3.jpg"], theme: "HPP 2003", year: 2003, place: "Vul plaats in" },
   { photos: ["./images/2002/1.jpg", "./images/2002/2.jpg", "./images/2002/3.jpg"], theme: "HPP 2002", year: 2002, place: "Vul plaats in" },
   { photos: ["./images/2001/1.jpg", "./images/2001/2.jpg", "./images/2001/3.jpg"], theme: "HPP 2001", year: 2001, place: "Vul plaats in" },
+    { photos: ["./images/2026/1.jpg", "./images/2026/2.jpg", "./images/2026/3.jpg"], theme: "HPP 2026", year: 2026, place: "Vul plaats in" },
+  { photos: ["./images/2025/1.jpg", "./images/2025/2.jpg", "./images/2025/3.jpg"], theme: "HPP 2025", year: 2025, place: "Vul plaats in" },
 
   
 ];
