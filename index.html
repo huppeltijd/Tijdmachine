@@ -1579,11 +1579,15 @@ function runCountdown(onDone) {
       clearInterval(_countdownTimer);
       _countdownTimer = null;
       // EERST het spelscherm tonen, achter de overlay,
-      // dan pas de overlay verbergen → geen flits van beginscherm.
+      // dan pas de overlay verbergen → geen flits van beginscherm/oude vraag.
+      // Dubbele requestAnimationFrame zorgt dat mobiele browsers de nieuwe
+      // DOM-inhoud ook echt eerst painten vóór we de overlay weghalen.
       try { onDone(); } catch (e) { console.error(e); }
       requestAnimationFrame(() => {
-        cd.hidden = true;
-        cd.setAttribute("aria-hidden", "true");
+        requestAnimationFrame(() => {
+          cd.hidden = true;
+          cd.setAttribute("aria-hidden", "true");
+        });
       });
       return;
     }
@@ -1607,8 +1611,17 @@ function startGame() {
   state.order = randomYears.slice(0, count);
   state.current = 0;
   $("#photo-total").textContent = String(count);
-  show("#screen-game");
+
+  // alle restjes van een vorige ronde wissen vóór we zichtbaar maken
+  $("#photo-slot").innerHTML = "";
+  document.querySelectorAll(".options").forEach(o => (o.innerHTML = ""));
+  $("#feedback").textContent = "";
+  $("#feedback").className = "feedback";
+
+  // eerst nieuwe inhoud klaarzetten in het (nog verborgen) spelscherm,
+  // pas daarna zichtbaar maken — voorkomt een flits met de vorige vraag
   showPhoto();
+  show("#screen-game");
   startTimer();
 }
 function finish() {
