@@ -1223,7 +1223,10 @@ function playMetalClick() {
 // tijdswarp (5 seconden): bassweep + harmonisch laag + shimmer + whoosh + accenten
 function playTimeWarp(durSec = 5) {
   const ctx = getAudioCtx();
-  if (!ctx || ctx.state !== "running") return;
+  if (!ctx) return;
+  // op iOS rapporteert AudioContext direct na resume() nog 'suspended' — toch
+  // schedulen; de audio speelt zodra het gebaar volledig is afgehandeld.
+  if (ctx.state === "suspended") { try { ctx.resume(); } catch {} }
   const now  = ctx.currentTime;
   const end  = now + durSec;
   const peak = now + durSec * 0.55;
