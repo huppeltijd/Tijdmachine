@@ -530,6 +530,54 @@
     }
 
     /* ============================================================
+       SPLASH (klik-om-te-starten, ontgrendelt audio + sync warp)
+    ============================================================ */
+    #screen-splash {
+      position: fixed; inset: 0;
+      z-index: 8000;
+      background:
+        radial-gradient(ellipse at 50% 40%, #2c92ab 0%, #0a3c4d 60%, #04141d 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+    }
+    .splash-btn {
+      position: relative;
+      z-index: 2;
+      animation: splash-pulse 1.7s ease-in-out infinite;
+    }
+    @keyframes splash-pulse {
+      0%, 100% { transform: translateY(0)   scale(1);    box-shadow: inset 0 1px 0 rgba(255,240,200,.55), inset 0 -2px 0 rgba(0,0,0,.25), 0 6px 0 #3a2410, 0 10px 22px rgba(0,0,0,.45); }
+      50%      { transform: translateY(-2px) scale(1.04); box-shadow: inset 0 1px 0 rgba(255,240,200,.6),  inset 0 -2px 0 rgba(0,0,0,.25), 0 8px 0 #3a2410, 0 14px 30px rgba(230,184,90,.4); }
+    }
+    /* sterren-veld op de splash */
+    .stars {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .star {
+      position: absolute;
+      color: var(--brass);
+      text-shadow:
+        0 0 8px rgba(230,184,90,.45),
+        0 0 18px rgba(230,184,90,.25);
+      opacity: 0.7;
+      animation: twinkle 3.6s ease-in-out infinite;
+      user-select: none;
+      font-family: Georgia, serif;
+      line-height: 1;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.25; transform: scale(0.7)  rotate(0deg); }
+      50%      { opacity: 1;    transform: scale(1.1)  rotate(180deg); }
+    }
+    /* ============================================================
        COUNTDOWN-OVERLAY (full-screen, 5→0)
     ============================================================ */
     #screen-countdown {
@@ -673,9 +721,45 @@
   </defs>
   <rect width="100%" height="100%" fill="url(#cogtile)"/>
 </svg>
+<!-- ============ SPLASH ============ -->
+<section id="screen-splash">
+  <div class="stars" aria-hidden="true">
+    <span class="star" style="top:5%;  left:8%;  font-size:30px; animation-delay:0.0s;">✦</span>
+    <span class="star" style="top:9%;  left:32%; font-size:18px; animation-delay:1.2s;">✦</span>
+    <span class="star" style="top:7%;  left:54%; font-size:24px; animation-delay:2.4s;">✦</span>
+    <span class="star" style="top:11%; left:74%; font-size:36px; animation-delay:0.6s;">✦</span>
+    <span class="star" style="top:6%;  left:92%; font-size:20px; animation-delay:1.8s;">✦</span>
+    <span class="star" style="top:18%; left:18%; font-size:22px; animation-delay:0.9s;">✦</span>
+    <span class="star" style="top:22%; left:46%; font-size:16px; animation-delay:2.1s;">✦</span>
+    <span class="star" style="top:20%; left:66%; font-size:28px; animation-delay:0.3s;">✦</span>
+    <span class="star" style="top:24%; left:86%; font-size:18px; animation-delay:1.5s;">✦</span>
+    <span class="star" style="top:30%; left:6%;  font-size:24px; animation-delay:2.7s;">✦</span>
+    <span class="star" style="top:32%; left:26%; font-size:14px; animation-delay:0.5s;">✦</span>
+    <span class="star" style="top:34%; left:72%; font-size:32px; animation-delay:1.7s;">✦</span>
+    <span class="star" style="top:36%; left:94%; font-size:20px; animation-delay:0.8s;">✦</span>
+    <span class="star" style="top:42%; left:14%; font-size:18px; animation-delay:2.0s;">✦</span>
+    <span class="star" style="top:44%; left:84%; font-size:26px; animation-delay:0.4s;">✦</span>
+    <span class="star" style="top:54%; left:7%;  font-size:22px; animation-delay:1.3s;">✦</span>
+    <span class="star" style="top:56%; left:92%; font-size:18px; animation-delay:2.5s;">✦</span>
+    <span class="star" style="top:62%; left:22%; font-size:30px; animation-delay:0.2s;">✦</span>
+    <span class="star" style="top:64%; left:78%; font-size:16px; animation-delay:1.0s;">✦</span>
+    <span class="star" style="top:70%; left:8%;  font-size:24px; animation-delay:2.2s;">✦</span>
+    <span class="star" style="top:72%; left:48%; font-size:14px; animation-delay:0.7s;">✦</span>
+    <span class="star" style="top:74%; left:66%; font-size:28px; animation-delay:1.9s;">✦</span>
+    <span class="star" style="top:78%; left:90%; font-size:20px; animation-delay:0.1s;">✦</span>
+    <span class="star" style="top:84%; left:16%; font-size:18px; animation-delay:1.4s;">✦</span>
+    <span class="star" style="top:86%; left:42%; font-size:26px; animation-delay:2.6s;">✦</span>
+    <span class="star" style="top:88%; left:72%; font-size:18px; animation-delay:0.5s;">✦</span>
+    <span class="star" style="top:92%; left:8%;  font-size:30px; animation-delay:1.6s;">✦</span>
+    <span class="star" style="top:93%; left:54%; font-size:16px; animation-delay:2.3s;">✦</span>
+    <span class="star" style="top:90%; left:90%; font-size:22px; animation-delay:0.9s;">✦</span>
+  </div>
+  <button class="btn splash-btn" id="btn-enter">Begin de tijdreis</button>
+</section>
+
 <div class="wrap">
   <!-- ============ START ============ -->
-  <section id="screen-start">
+  <section id="screen-start" hidden>
     <h1>De HuPPelTijdmachine</h1>
     <p class="subtitle">Reis door dertig jaar Huppelepup-topmomenten in de tijd. Wie raadt ze het snelst?</p>
     <!-- ===== HERO: animated time machine ===== -->
@@ -844,7 +928,6 @@
       <p>Bij elke foto kies je het juiste <b>thema</b>, <b>jaartal</b> en de juiste <b>plaats</b>.
         Heb je alle drie juist, dan reis je verder door de HuPPelTijd-geschiedenis. De klok tikt door.
         Na 10 juiste foto's finish je en kom je misschien op het scorebord. Als je op tijd bent...</p>
-      <p class="small">De foto's én de antwoordopties worden bij elke nieuwe ronde door elkaar geschud.</p>
       <div class="actions">
         <button class="btn" id="btn-start">Start de tijdreis</button>
       </div>
@@ -1137,6 +1220,117 @@ function playMetalClick() {
   osc.stop(now + 0.09);
 }
 
+// tijdswarp (5 seconden): bassweep + harmonisch laag + shimmer + whoosh + accenten
+function playTimeWarp(durSec = 5) {
+  const ctx = getAudioCtx();
+  if (!ctx || ctx.state !== "running") return;
+  const now  = ctx.currentTime;
+  const end  = now + durSec;
+  const peak = now + durSec * 0.55;
+
+  const master = ctx.createGain();
+  master.gain.value = 0.42;
+  master.connect(ctx.destination);
+
+  // 1) bass sawtooth, stijgt en valt terug
+  const bass = ctx.createOscillator();
+  bass.type = "sawtooth";
+  bass.frequency.setValueAtTime(40, now);
+  bass.frequency.exponentialRampToValueAtTime(160, peak);
+  bass.frequency.exponentialRampToValueAtTime(60, end);
+  const bassF = ctx.createBiquadFilter();
+  bassF.type = "lowpass";
+  bassF.frequency.setValueAtTime(250, now);
+  bassF.frequency.exponentialRampToValueAtTime(1500, peak);
+  bassF.frequency.exponentialRampToValueAtTime(500, end);
+  bassF.Q.value = 5;
+  const bassG = ctx.createGain();
+  bassG.gain.setValueAtTime(0, now);
+  bassG.gain.linearRampToValueAtTime(0.45, now + 0.5);
+  bassG.gain.linearRampToValueAtTime(0.45, end - 0.8);
+  bassG.gain.exponentialRampToValueAtTime(0.001, end);
+  bass.connect(bassF).connect(bassG).connect(master);
+  bass.start(now); bass.stop(end + 0.3);
+
+  // 2) harmonisch laag (kwint hoger, lichtjes verstemd)
+  const harm = ctx.createOscillator();
+  harm.type = "sawtooth";
+  harm.detune.value = 9;
+  harm.frequency.setValueAtTime(60, now);
+  harm.frequency.exponentialRampToValueAtTime(240, peak);
+  harm.frequency.exponentialRampToValueAtTime(90, end);
+  const harmF = ctx.createBiquadFilter();
+  harmF.type = "lowpass";
+  harmF.frequency.setValueAtTime(400, now);
+  harmF.frequency.exponentialRampToValueAtTime(2200, peak);
+  harmF.frequency.exponentialRampToValueAtTime(700, end);
+  harmF.Q.value = 6;
+  const harmG = ctx.createGain();
+  harmG.gain.setValueAtTime(0, now);
+  harmG.gain.linearRampToValueAtTime(0.22, now + 0.8);
+  harmG.gain.linearRampToValueAtTime(0.22, end - 1);
+  harmG.gain.exponentialRampToValueAtTime(0.001, end);
+  harm.connect(harmF).connect(harmG).connect(master);
+  harm.start(now); harm.stop(end + 0.3);
+
+  // 3) shimmer (hogere driehoek, sweep)
+  const shim = ctx.createOscillator();
+  shim.type = "triangle";
+  shim.frequency.setValueAtTime(180, now);
+  shim.frequency.exponentialRampToValueAtTime(1500, peak);
+  shim.frequency.exponentialRampToValueAtTime(350, end);
+  const shimG = ctx.createGain();
+  shimG.gain.setValueAtTime(0, now);
+  shimG.gain.linearRampToValueAtTime(0.14, now + durSec * 0.35);
+  shimG.gain.linearRampToValueAtTime(0.12, peak);
+  shimG.gain.exponentialRampToValueAtTime(0.001, end);
+  shim.connect(shimG).connect(master);
+  shim.start(now); shim.stop(end + 0.3);
+
+  // 4) whoosh: witte ruis door sweepende bandpass
+  const nbuf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * (durSec + 0.3)), ctx.sampleRate);
+  const ndata = nbuf.getChannelData(0);
+  for (let i = 0; i < ndata.length; i++) ndata[i] = Math.random() * 2 - 1;
+  const noise = ctx.createBufferSource();
+  noise.buffer = nbuf;
+  const nf = ctx.createBiquadFilter();
+  nf.type = "bandpass";
+  nf.frequency.setValueAtTime(200, now);
+  nf.frequency.exponentialRampToValueAtTime(3000, peak);
+  nf.frequency.exponentialRampToValueAtTime(600, end);
+  nf.Q.value = 2.5;
+  const ng = ctx.createGain();
+  ng.gain.setValueAtTime(0, now);
+  ng.gain.linearRampToValueAtTime(0.22, now + durSec * 0.55);
+  ng.gain.linearRampToValueAtTime(0.20, now + durSec * 0.7);
+  ng.gain.exponentialRampToValueAtTime(0.001, end);
+  noise.connect(nf).connect(ng).connect(master);
+  noise.start(now); noise.stop(end + 0.3);
+
+  // 5) "engage"-thunk aan het begin
+  const thunk = ctx.createOscillator();
+  thunk.type = "sine";
+  thunk.frequency.setValueAtTime(120, now);
+  thunk.frequency.exponentialRampToValueAtTime(50, now + 0.6);
+  const tg = ctx.createGain();
+  tg.gain.setValueAtTime(0.55, now);
+  tg.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
+  thunk.connect(tg).connect(master);
+  thunk.start(now); thunk.stop(now + 1.0);
+
+  // 6) bell-ping aan het einde (machine klaar)
+  const ping = ctx.createOscillator();
+  ping.type = "sine";
+  ping.frequency.setValueAtTime(660, end - 0.35);
+  ping.frequency.exponentialRampToValueAtTime(440, end);
+  const pg = ctx.createGain();
+  pg.gain.setValueAtTime(0, end - 0.35);
+  pg.gain.linearRampToValueAtTime(0.3, end - 0.3);
+  pg.gain.exponentialRampToValueAtTime(0.001, end + 0.4);
+  ping.connect(pg).connect(master);
+  ping.start(end - 0.35); ping.stop(end + 0.4);
+}
+
 // klok-tik: kort tik-tak afwisselend hoog/laag
 let _tickHigh = false;
 function playClockTick() {
@@ -1363,6 +1557,9 @@ function runCountdown(onDone) {
   let n = Math.max(1, Number(COUNTDOWN_SECONDS) || 5);
   _tickHigh = false;  // ritme begint met "hoge" tik
 
+  // tijdswarp loopt mee tijdens de aftelklok
+  playTimeWarp(n);
+
   function paint(value) {
     num.textContent = value;
     num.classList.remove("tick");
@@ -1499,8 +1696,17 @@ function escapeHtml(s) {
   })[c]);
 }
 // ============================================================
-//  EVENTS  (Start en Opnieuw spelen → countdown → spel)
+//  EVENTS  (Splash → assemblage+warp → start → countdown → spel)
 // ============================================================
+$("#btn-enter").addEventListener("click", () => {
+  // gebruikersgebaar → AudioContext is nu mogelijk te starten
+  getAudioCtx();
+  playMetalClick();
+  // splash weg, beginscherm aan — CSS-assemblage begint vanaf t=0
+  $("#screen-splash").hidden = true;
+  $("#screen-start").hidden = false;
+  playTimeWarp();
+});
 $("#btn-start").addEventListener("click",  () => runCountdown(startGame));
 $("#btn-replay").addEventListener("click", () => runCountdown(startGame));
 $("#btn-check").addEventListener("click", check);
