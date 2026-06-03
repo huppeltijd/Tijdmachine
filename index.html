@@ -39,7 +39,6 @@
       position: relative;
       overflow-x: hidden;
     }
-
     /* ============================================================
        ACHTERGRONDPATROON  (klokken + tandwielen)
     ============================================================ */
@@ -50,7 +49,6 @@
       pointer-events: none;
       opacity: .55;
     }
-
     .wrap {
       position: relative;
       z-index: 1;
@@ -58,7 +56,6 @@
       margin: 0 auto;
       padding: 36px 24px 80px;
     }
-
     h1, h2, h3 {
       font-family: "Playfair Display", Georgia, serif;
       letter-spacing: .03em;
@@ -89,7 +86,6 @@
       text-shadow: 0 1px 2px rgba(0,0,0,.5);
     }
     p { line-height: 1.55; }
-
     /* ============================================================
        PLAQUETTE  (brass panel)
     ============================================================ */
@@ -124,7 +120,6 @@
     }
     .plaque .rivet-bl { left: 10px; }
     .plaque .rivet-br { right: 10px; }
-
     /* ============================================================
        HUD + TIMER  (chronometer)
     ============================================================ */
@@ -162,7 +157,6 @@
       font-size: 24px;
       letter-spacing: .12em;
     }
-
 /* ============================================================
    FOTO FRAME  (brass ornament)
    Volledige foto tonen - geen bijsnijden
@@ -187,7 +181,6 @@
     inset 0 0 0 1px #2a1a0c,
     0 16px 40px rgba(0,0,0,.55);
 }
-
 .frame::before,
 .frame::after,
 .frame .corner-bl,
@@ -208,27 +201,22 @@
     inset 0 -2px 3px rgba(0,0,0,.45);
   z-index: 2;
 }
-
 .frame::before {
   top: -4px;
   left: -4px;
 }
-
 .frame::after {
   top: -4px;
   right: -4px;
 }
-
 .frame .corner-bl {
   bottom: -4px;
   left: -4px;
 }
-
 .frame .corner-br {
   bottom: -4px;
   right: -4px;
 }
-
 .frame img,
 .frame svg.photo {
   display: block;
@@ -237,9 +225,7 @@
   height: auto;
   margin: 0 auto;
   background: #0a2530;
-
 }
-
     /* ============================================================
        VRAAGRIJEN
     ============================================================ */
@@ -306,7 +292,6 @@
       border-color: #6a2814;
     }
     .opt.locked { cursor: default; }
-
     /* ============================================================
        GROTE KNOPPEN  (brass lever)
     ============================================================ */
@@ -342,7 +327,6 @@
         0 5px 12px rgba(0,0,0,.45);
     }
     .btn[disabled] { opacity: .5; cursor: not-allowed; }
-
     /* ============================================================
        FEEDBACK
     ============================================================ */
@@ -356,7 +340,6 @@
     }
     .feedback.bad  { color: #ffb398; }
     .feedback.good { color: #b9efa1; }
-
     /* ============================================================
        SCOREBORD
     ============================================================ */
@@ -404,7 +387,6 @@
       font-style: italic;
       padding: 22px 0;
     }
-
     /* ============================================================
        INPUT
     ============================================================ */
@@ -423,9 +405,10 @@
       box-shadow: inset 0 2px 6px rgba(0,0,0,.5);
     }
     .name-input:focus { outline: none; border-color: var(--brass); box-shadow: 0 0 0 2px rgba(230,184,90,.3), inset 0 2px 6px rgba(0,0,0,.5); }
-
     /* ============================================================
        TIJDMACHINE SVG (hero op startscherm)
+       - assemblage van losse onderdelen in eerste 5 seconden
+       - daarna ambient-animaties (hum/flap/spin) infinite
     ============================================================ */
     .machine-wrap {
       display: flex;
@@ -438,16 +421,29 @@
       height: auto;
       filter: drop-shadow(0 14px 22px rgba(0,0,0,.55));
     }
+
+    /* basis-ambient + assemblage tegelijk gedeclareerd via comma's:
+       eerst de "fly-in"-keyframe (forwards), daarna de oneindige idle */
     .machine .body {
       transform-origin: 300px 230px;
-      animation: hum 5s ease-in-out infinite;
+      animation:
+        assemble-body 1.6s 0.5s cubic-bezier(.2,.7,.3,1.25) both,
+        hum 5s 2.2s ease-in-out infinite;
     }
     @keyframes hum {
       0%, 100% { transform: translateY(0); }
       50%      { transform: translateY(-3px); }
     }
+    @keyframes assemble-body {
+      0%   { transform: translate(0, -420px) rotate(-540deg) scale(.18); opacity: 0; }
+      45%  { opacity: 1; }
+      100% { transform: translate(0, 0) rotate(0) scale(1); opacity: 1; }
+    }
+
     .machine .wing {
-      animation: flap 4.5s ease-in-out infinite;
+      animation:
+        assemble-wing 0.9s 2.2s cubic-bezier(.4,.2,.25,1) both,
+        flap 4.5s 3.2s ease-in-out infinite;
     }
     .machine .wing.left  { transform-origin: 200px 230px; }
     .machine .wing.right { transform-origin: 400px 230px; }
@@ -455,15 +451,71 @@
       0%, 100% { transform: scaleX(.55); opacity: .85; }
       50%      { transform: scaleX(1);   opacity: 1; }
     }
+    .machine .wing.left {
+      animation:
+        assemble-wing-left 0.9s 2.2s cubic-bezier(.4,.2,.25,1) both,
+        flap 4.5s 3.2s ease-in-out infinite;
+    }
+    .machine .wing.right {
+      animation:
+        assemble-wing-right 0.9s 2.2s cubic-bezier(.4,.2,.25,1) both,
+        flap 4.5s 3.2s ease-in-out infinite;
+    }
+    @keyframes assemble-wing-left {
+      0%   { transform: translateX(-420px) scaleX(.25); opacity: 0; }
+      100% { transform: translateX(0)      scaleX(.55); opacity: .85; }
+    }
+    @keyframes assemble-wing-right {
+      0%   { transform: translateX(420px)  scaleX(.25); opacity: 0; }
+      100% { transform: translateX(0)      scaleX(.55); opacity: .85; }
+    }
+
     .machine .flywheel {
       transform-origin: 230px 360px;
-      animation: spin 3.5s linear infinite;
+      animation:
+        assemble-flywheel 0.9s 1.8s cubic-bezier(.3,.6,.4,1.3) both,
+        spin 3.5s 2.7s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .machine .gear-bg-a { transform-origin: 300px 230px; animation: spin 18s linear infinite; }
-    .machine .gear-bg-b { transform-origin: 300px 230px; animation: spin 24s linear infinite reverse; }
-    .machine .hand-minute { transform-origin: 300px 230px; animation: spin 60s steps(60) infinite; }
-    .machine .hand-hour   { transform-origin: 300px 230px; animation: spin 720s steps(60) infinite; }
+    @keyframes assemble-flywheel {
+      0%   { transform: translate(-200px, 110px) rotate(-540deg) scale(.25); opacity: 0; }
+      100% { transform: translate(0, 0) rotate(0) scale(1); opacity: 1; }
+    }
+
+    .machine .sled {
+      animation: assemble-sled 1.0s 0s cubic-bezier(.3,.6,.4,1) both;
+    }
+    @keyframes assemble-sled {
+      0%   { transform: translate(0, 320px); opacity: 0; }
+      100% { transform: translate(0, 0); opacity: 1; }
+    }
+
+    .machine .gear-bg-a {
+      transform-origin: 300px 230px;
+      animation:
+        assemble-gear 1.2s 0.4s ease-out both,
+        spin 18s 1.6s linear infinite;
+    }
+    .machine .gear-bg-b {
+      transform-origin: 300px 230px;
+      animation:
+        assemble-gear 1.2s 0.4s ease-out both,
+        spin 24s 1.6s linear infinite reverse;
+    }
+    @keyframes assemble-gear {
+      0%   { transform: scale(0); opacity: 0; }
+      100% { transform: scale(1); opacity: .55; }
+    }
+
+    .machine .steam {
+      animation: assemble-steam 0.6s 3.6s ease-in both;
+    }
+    @keyframes assemble-steam {
+      0%   { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    .machine .hand-minute { transform-origin: 300px 230px; animation: spin 60s 2.2s steps(60) infinite; }
+    .machine .hand-hour   { transform-origin: 300px 230px; animation: spin 720s 2.2s steps(60) infinite; }
     .machine .puff {
       transform-origin: center;
       animation: puff 3.4s ease-out infinite;
@@ -478,13 +530,85 @@
     }
 
     /* ============================================================
+       COUNTDOWN-OVERLAY (full-screen, 5→0)
+    ============================================================ */
+    #screen-countdown {
+      position: fixed; inset: 0;
+      z-index: 9999;
+      background:
+        radial-gradient(ellipse at 50% 50%, #1f7b94 0%, #0a3c4d 65%, #04141d 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow: hidden;
+    }
+    #screen-countdown::before {
+      /* zelfde klok/tandwiel-patroon op de countdown-bg */
+      content: "";
+      position: absolute; inset: 0;
+      background: inherit;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .cd-stage {
+      position: relative;
+      width: min(92vw, 760px);
+      aspect-ratio: 700/520;
+      filter: drop-shadow(0 24px 36px rgba(0,0,0,.65));
+    }
+    .cd-svg { width: 100%; height: 100%; display: block; }
+    .cd-number {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: clamp(72px, 16vw, 200px);
+      font-weight: bold;
+      color: #3a2410;
+      text-shadow:
+        0 3px 0 rgba(255,240,200,.4),
+        0 4px 14px rgba(0,0,0,.35),
+        0 0 40px rgba(230,184,90,.55);
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+    .cd-number.tick {
+      animation: cd-tick .85s cubic-bezier(.25,.65,.3,1.35);
+    }
+    @keyframes cd-tick {
+      0%   { transform: translate(-50%, -50%) scale(.25) rotate(-25deg); opacity: 0; }
+      40%  { transform: translate(-50%, -50%) scale(1.35) rotate(0);     opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(1)    rotate(0);     opacity: 1; }
+    }
+    /* dramatische, snellere ambient-animaties in de countdown */
+    #screen-countdown .cd-bg-a { transform-origin: 350px 260px; animation: spin 6s linear infinite; }
+    #screen-countdown .cd-bg-b { transform-origin: 350px 260px; animation: spin 9s linear infinite reverse; }
+    #screen-countdown .cd-wing { animation: flap 1.2s ease-in-out infinite; }
+    #screen-countdown .cd-wing.left  { transform-origin: 270px 260px; }
+    #screen-countdown .cd-wing.right { transform-origin: 430px 260px; }
+    #screen-countdown .cd-flywheel-a { transform-origin: 130px 430px; animation: spin 1.2s linear infinite; }
+    #screen-countdown .cd-flywheel-b { transform-origin: 570px 430px; animation: spin 1.5s linear infinite reverse; }
+    #screen-countdown .cd-body { transform-origin: 350px 260px; animation: cd-pulse 1s ease-in-out infinite; }
+    @keyframes cd-pulse {
+      0%, 100% { transform: scale(1); }
+      50%      { transform: scale(1.035); }
+    }
+    #screen-countdown .cd-puff {
+      animation: puff 1.4s ease-out infinite;
+      opacity: 0;
+    }
+    #screen-countdown .cd-puff.p2 { animation-delay: 0.45s; }
+    #screen-countdown .cd-puff.p3 { animation-delay: 0.9s; }
+    /* ============================================================
        HELPERS
     ============================================================ */
     .center { text-align: center; }
     .mt { margin-top: 22px; }
     .small { font-size: 13px; color: #b8d6e1; }
     [hidden] { display: none !important; }
-
     @media (max-width: 640px) {
       .wrap { padding: 20px 12px 60px; }
       h1 { font-size: 32px; }
@@ -496,7 +620,6 @@
   </style>
 </head>
 <body>
-
 <!-- ==================================================
      ACHTERGRONDPATROON · klokken & tandwielen
 ================================================== -->
@@ -514,16 +637,13 @@
         <line x1="120" y1="100" x2="120" y2="55"  stroke-width="2"/>
         <line x1="120" y1="100" x2="155" y2="100" stroke-width="1.6"/>
         <circle cx="120" cy="100" r="2.5" fill="rgba(8,40,55,.55)"/>
-
         <!-- tandwiel 1 -->
         <circle cx="430" cy="80" r="52" stroke-dasharray="9 5" stroke-width="11"/>
         <circle cx="430" cy="80" r="36"/>
         <circle cx="430" cy="80" r="14"/>
-
         <!-- klein tandwiel -->
         <circle cx="260" cy="200" r="26" stroke-dasharray="5 4" stroke-width="6"/>
         <circle cx="260" cy="200" r="13"/>
-
         <!-- klok 2 -->
         <circle cx="350" cy="300" r="48"/>
         <line x1="350" y1="252" x2="350" y2="262"/>
@@ -532,12 +652,10 @@
         <line x1="302" y1="300" x2="312" y2="300"/>
         <line x1="350" y1="300" x2="370" y2="280" stroke-width="2"/>
         <line x1="350" y1="300" x2="350" y2="270" stroke-width="1.6"/>
-
         <!-- tandwiel groot -->
         <circle cx="90" cy="410" r="60" stroke-dasharray="10 6" stroke-width="13"/>
         <circle cx="90" cy="410" r="42"/>
         <circle cx="90" cy="410" r="18"/>
-
         <!-- klok 3 -->
         <circle cx="475" cy="450" r="55"/>
         <circle cx="475" cy="450" r="46"/>
@@ -547,7 +665,6 @@
         <line x1="420" y1="450" x2="430" y2="450"/>
         <line x1="475" y1="450" x2="475" y2="412" stroke-width="2"/>
         <line x1="475" y1="450" x2="500" y2="450" stroke-width="1.6"/>
-
         <!-- tandwiel mid -->
         <circle cx="240" cy="450" r="34" stroke-dasharray="7 5" stroke-width="8"/>
         <circle cx="240" cy="450" r="20"/>
@@ -556,14 +673,11 @@
   </defs>
   <rect width="100%" height="100%" fill="url(#cogtile)"/>
 </svg>
-
 <div class="wrap">
-
   <!-- ============ START ============ -->
   <section id="screen-start">
     <h1>De HuPPelTijdmachine</h1>
     <p class="subtitle">Reis door dertig jaar Huppelepup-topmomenten in de tijd. Wie raadt ze het snelst?</p>
-
     <!-- ===== HERO: animated time machine ===== -->
     <div class="machine-wrap">
       <svg class="machine" viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -584,10 +698,8 @@
             <stop offset="100%" stop-color="#b88c45"/>
           </radialGradient>
         </defs>
-
         <!-- schaduw onder -->
         <ellipse cx="300" cy="465" rx="190" ry="9" fill="rgba(0,0,0,.4)"/>
-
         <!-- decoratieve tandwielen achter de body -->
         <g class="gear-bg-a" opacity=".55">
           <circle cx="300" cy="230" r="178" fill="none" stroke="#8a5c1c" stroke-width="14" stroke-dasharray="13 9"/>
@@ -595,7 +707,6 @@
         <g class="gear-bg-b" opacity=".5">
           <circle cx="300" cy="230" r="162" fill="none" stroke="#6a3818" stroke-width="2"/>
         </g>
-
         <!-- LEFT WING -->
         <g class="wing left">
           <line x1="220" y1="230" x2="110" y2="230" stroke="url(#copper)" stroke-width="7" stroke-linecap="round"/>
@@ -612,7 +723,6 @@
             <line x1="0" y1="0" x2="-50" y2="28" stroke="#8a5c1c" stroke-width="1"/>
           </g>
         </g>
-
         <!-- RIGHT WING -->
         <g class="wing right">
           <line x1="380" y1="230" x2="490" y2="230" stroke="url(#copper)" stroke-width="7" stroke-linecap="round"/>
@@ -628,7 +738,6 @@
             <line x1="0" y1="0" x2="50" y2="28" stroke="#8a5c1c" stroke-width="1"/>
           </g>
         </g>
-
         <!-- BODY -->
         <g class="body">
           <!-- buitenring tandwiel -->
@@ -638,7 +747,7 @@
           <!-- brass ring met bolts -->
           <circle cx="300" cy="230" r="125" fill="url(#brass)" stroke="#5c3a0e" stroke-width="2"/>
           <g fill="#5c3a0e">
-            <!-- 12 bolts om ring (computed bij 300,230, r=110, 12 stappen) -->
+            <!-- 12 bolts om ring -->
             <circle cx="300" cy="120" r="4"/>
             <circle cx="355" cy="135" r="4"/>
             <circle cx="395" cy="175" r="4"/>
@@ -681,7 +790,6 @@
                 stroke="#3a2410" stroke-width="4" stroke-linecap="round"/>
           <circle cx="300" cy="230" r="5" fill="#5c3a0e" stroke="#3a2410" stroke-width="1"/>
         </g>
-
         <!-- SLED + base -->
         <g class="sled">
           <!-- post/staal van body naar platform -->
@@ -713,7 +821,6 @@
           <path d="M 440,430 Q 450,440 442,448 Q 432,448 430,438"
                 fill="none" stroke="#3a2410" stroke-width="4" stroke-linecap="round"/>
         </g>
-
         <!-- FLYWHEEL (klein vooraan) -->
         <g class="flywheel">
           <circle cx="230" cy="360" r="22" fill="url(#brass)" stroke="#3a2410" stroke-width="2"/>
@@ -725,7 +832,6 @@
           </g>
           <circle cx="230" cy="360" r="4" fill="#3a2410"/>
         </g>
-
         <!-- STOOMPLUIMEN -->
         <g class="steam">
           <circle class="puff p1" cx="378" cy="350" r="9" fill="rgba(253,243,211,.5)"/>
@@ -734,10 +840,9 @@
         </g>
       </svg>
     </div>
-
     <div class="plaque">
       <p>Bij elke foto kies je het juiste <b>thema</b>, <b>jaartal</b> en de juiste <b>plaats</b>.
-        Heb je alle drie juist, dan reis je verder door de HuPPelTijd-geschiedenis". De klok tikt door.
+        Heb je alle drie juist, dan reis je verder door de HuPPelTijd-geschiedenis. De klok tikt door.
         Na 10 juiste foto's finish je en kom je misschien op het scorebord. Als je op tijd bent...</p>
       <p class="small">De foto's én de antwoordopties worden bij elke nieuwe ronde door elkaar geschud.</p>
       <div class="actions">
@@ -745,11 +850,9 @@
       </div>
       <span class="rivet-bl"></span><span class="rivet-br"></span>
     </div>
-
     <h2 class="center mt">Top 20 snelste tijden</h2>
     <ol class="board" id="board-start"><li class="empty">Scorebord laden…</li></ol>
   </section>
-
   <!-- ============ GAME ============ -->
   <section id="screen-game" hidden>
     <div class="hud">
@@ -773,12 +876,10 @@
         <span id="timer">00:00.0</span>
       </div>
     </div>
-
     <div class="frame">
       <span class="corner-bl"></span><span class="corner-br"></span>
       <div id="photo-slot"></div>
     </div>
-
     <div class="row">
       <div class="label">Thema</div>
       <div class="options" data-field="theme"></div>
@@ -791,13 +892,11 @@
       <div class="label">Plaats</div>
       <div class="options" data-field="place"></div>
     </div>
-
     <div class="actions">
       <button class="btn" id="btn-check">Controleer</button>
     </div>
     <div class="feedback" id="feedback"></div>
   </section>
-
   <!-- ============ FINISH ============ -->
   <section id="screen-finish" hidden>
     <h1>Volbracht!</h1>
@@ -821,7 +920,6 @@
       <span class="rivet-bl"></span><span class="rivet-br"></span>
     </div>
   </section>
-
   <!-- ============ BOARD ============ -->
   <section id="screen-board" hidden>
     <h1>Top 10 snelste tijden</h1>
@@ -830,11 +928,140 @@
       <button class="btn" id="btn-replay">Opnieuw spelen</button>
     </div>
   </section>
-
   <p class="center small mt" style="margin-top:48px; opacity:.6;">
     Een HuPPelTijd-spel 2026
   </p>
 </div>
+
+<!-- ============ FULL-SCREEN COUNTDOWN OVERLAY ============ -->
+<section id="screen-countdown" hidden aria-hidden="true">
+  <div class="cd-stage">
+    <svg class="cd-svg" viewBox="0 0 700 520" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+      <defs>
+        <radialGradient id="cd-brass" cx="35%" cy="30%" r="75%">
+          <stop offset="0%"  stop-color="#fbe19b"/>
+          <stop offset="35%" stop-color="#e6b85a"/>
+          <stop offset="75%" stop-color="#a8771e"/>
+          <stop offset="100%" stop-color="#5c3a0e"/>
+        </radialGradient>
+        <linearGradient id="cd-copper" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"  stop-color="#cb8048"/>
+          <stop offset="100%" stop-color="#6a3818"/>
+        </linearGradient>
+        <radialGradient id="cd-cream" cx="35%" cy="30%" r="75%">
+          <stop offset="0%"  stop-color="#fdf3d3"/>
+          <stop offset="80%" stop-color="#e8d29a"/>
+          <stop offset="100%" stop-color="#b88c45"/>
+        </radialGradient>
+      </defs>
+
+      <!-- groot achtergrond-tandwiel -->
+      <g class="cd-bg-a" opacity=".55">
+        <circle cx="350" cy="260" r="240" fill="none" stroke="#8a5c1c" stroke-width="26" stroke-dasharray="18 12"/>
+      </g>
+      <g class="cd-bg-b" opacity=".5">
+        <circle cx="350" cy="260" r="200" fill="none" stroke="#6a3818" stroke-width="4"/>
+      </g>
+
+      <!-- LEFT WING -->
+      <g class="cd-wing left">
+        <line x1="265" y1="260" x2="100" y2="260" stroke="url(#cd-copper)" stroke-width="10" stroke-linecap="round"/>
+        <circle cx="100" cy="260" r="13" fill="url(#cd-brass)" stroke="#5c3a0e" stroke-width="2"/>
+        <g transform="translate(100 260)">
+          <path d="M 0,0 L -70,-32 L -88,-10 L -94,10 L -84,29 L -64,36 L 0,0 Z" fill="#2a1a0c" stroke="#5c3a0e" stroke-width="2"/>
+          <path d="M 0,0 L -70,32 L -88,10 L -94,-10 L -84,-29 L -64,-36 L 0,0 Z" fill="#1f1208" stroke="#5c3a0e" stroke-width="2"/>
+        </g>
+      </g>
+
+      <!-- RIGHT WING -->
+      <g class="cd-wing right">
+        <line x1="435" y1="260" x2="600" y2="260" stroke="url(#cd-copper)" stroke-width="10" stroke-linecap="round"/>
+        <circle cx="600" cy="260" r="13" fill="url(#cd-brass)" stroke="#5c3a0e" stroke-width="2"/>
+        <g transform="translate(600 260)">
+          <path d="M 0,0 L 70,-32 L 88,-10 L 94,10 L 84,29 L 64,36 L 0,0 Z" fill="#2a1a0c" stroke="#5c3a0e" stroke-width="2"/>
+          <path d="M 0,0 L 70,32 L 88,10 L 94,-10 L 84,-29 L 64,-36 L 0,0 Z" fill="#1f1208" stroke="#5c3a0e" stroke-width="2"/>
+        </g>
+      </g>
+
+      <!-- decoratieve kleine vliegwielen in de hoeken -->
+      <g class="cd-flywheel-a">
+        <circle cx="130" cy="430" r="32" fill="url(#cd-brass)" stroke="#3a2410" stroke-width="2"/>
+        <g stroke="#3a2410" stroke-width="2.2" stroke-linecap="round">
+          <line x1="130" y1="398" x2="130" y2="462"/>
+          <line x1="98" y1="430"  x2="162" y2="430"/>
+          <line x1="106" y1="407" x2="154" y2="453"/>
+          <line x1="154" y1="407" x2="106" y2="453"/>
+        </g>
+        <circle cx="130" cy="430" r="6" fill="#3a2410"/>
+      </g>
+      <g class="cd-flywheel-b">
+        <circle cx="570" cy="430" r="32" fill="url(#cd-brass)" stroke="#3a2410" stroke-width="2"/>
+        <g stroke="#3a2410" stroke-width="2.2" stroke-linecap="round">
+          <line x1="570" y1="398" x2="570" y2="462"/>
+          <line x1="538" y1="430" x2="602" y2="430"/>
+          <line x1="546" y1="407" x2="594" y2="453"/>
+          <line x1="594" y1="407" x2="546" y2="453"/>
+        </g>
+        <circle cx="570" cy="430" r="6" fill="#3a2410"/>
+      </g>
+
+      <!-- GROTE CENTRALE KLOK -->
+      <g class="cd-body">
+        <!-- buitenring tandwiel -->
+        <circle cx="350" cy="260" r="170"
+                fill="none" stroke="url(#cd-brass)" stroke-width="28"
+                stroke-dasharray="16 9"/>
+        <!-- brass ring -->
+        <circle cx="350" cy="260" r="155" fill="url(#cd-brass)" stroke="#5c3a0e" stroke-width="3"/>
+        <!-- bolts -->
+        <g fill="#5c3a0e">
+          <circle cx="350" cy="125" r="5"/>
+          <circle cx="418" cy="143" r="5"/>
+          <circle cx="467" cy="193" r="5"/>
+          <circle cx="485" cy="260" r="5"/>
+          <circle cx="467" cy="327" r="5"/>
+          <circle cx="418" cy="377" r="5"/>
+          <circle cx="350" cy="395" r="5"/>
+          <circle cx="282" cy="377" r="5"/>
+          <circle cx="233" cy="327" r="5"/>
+          <circle cx="215" cy="260" r="5"/>
+          <circle cx="233" cy="193" r="5"/>
+          <circle cx="282" cy="143" r="5"/>
+        </g>
+        <!-- inner donker ring -->
+        <circle cx="350" cy="260" r="118" fill="#1a0e08" stroke="#5c3a0e" stroke-width="2"/>
+        <!-- klokwijzerplaat -->
+        <circle cx="350" cy="260" r="100" fill="url(#cd-cream)" stroke="#5c3a0e" stroke-width="3"/>
+        <!-- uurstreepjes (4 hoofdpunten) -->
+        <g stroke="#3a2410" stroke-width="3" stroke-linecap="round">
+          <line x1="350" y1="168" x2="350" y2="180"/>
+          <line x1="350" y1="340" x2="350" y2="352"/>
+          <line x1="258" y1="260" x2="270" y2="260"/>
+          <line x1="442" y1="260" x2="430" y2="260"/>
+        </g>
+        <!-- romeinse cijfers, klein langs de rand -->
+        <g font-family="Georgia, serif" font-size="20" font-weight="bold" fill="#3a2410" text-anchor="middle">
+          <text x="350" y="208">XII</text>
+          <text x="418" y="267">III</text>
+          <text x="350" y="328">VI</text>
+          <text x="282" y="267">IX</text>
+        </g>
+      </g>
+
+      <!-- STOOMPLUIMEN aan zijkanten -->
+      <g class="cd-steam">
+        <circle class="cd-puff p1" cx="510" cy="385" r="13" fill="rgba(253,243,211,.5)"/>
+        <circle class="cd-puff p2" cx="525" cy="372" r="10" fill="rgba(253,243,211,.45)"/>
+        <circle class="cd-puff p3" cx="518" cy="358" r="8"  fill="rgba(253,243,211,.4)"/>
+        <circle class="cd-puff p1" cx="190" cy="385" r="13" fill="rgba(253,243,211,.5)"/>
+        <circle class="cd-puff p2" cx="175" cy="372" r="10" fill="rgba(253,243,211,.45)"/>
+        <circle class="cd-puff p3" cx="182" cy="358" r="8"  fill="rgba(253,243,211,.4)"/>
+      </g>
+    </svg>
+    <!-- countdown nummer komt over de klokwijzerplaat -->
+    <div class="cd-number" id="cd-number">5</div>
+  </div>
+</section>
 
 <!-- 30 foto's worden hier ingeladen -->
 <script src="photos.js"></script>
@@ -842,34 +1069,26 @@
 // ============================================================
 //  CONFIGURATIE
 // ============================================================
-
 //  Hoeveel foto's per ronde?
-//  - Zet op 0 om alle foto's uit photos.js te gebruiken.
-//  - Zet op bv. 10 om enkel de EERSTE 10 foto's te spelen. Handig om al te
-//    kunnen testen terwijl je foto 11..30 nog niet ingevuld hebt.
-//    De volgorde wordt nog wel geschud binnen die eerste 10.
 const NUM_PHOTOS = 10;
 
 //  Gedeeld scorebord via Firebase Realtime Database.
-//  - Laat leeg ("") om scores lokaal in de browser op te slaan.
-//  - Of vul je eigen URL in: "https://JOUW-PROJECT.firebaseio.com/scores"
-//    Volg de stappen in README.md om dit op te zetten.
 const FIREBASE_URL = "https://huppeltijd-75cf4-default-rtdb.europe-west1.firebasedatabase.app/scores";
 
+//  Hoe lang aftellen (seconden)?  Standaard 5.
+const COUNTDOWN_SECONDS = 5;
 // ============================================================
 //  STATE
 // ============================================================
 const $ = (sel) => document.querySelector(sel);
-
 const state = {
-  order: [],          // gemixte lijst van indexen 0..29
-  current: 0,         // welke vraag we nu spelen
+  order: [],
+  current: 0,
   selections: { theme: null, year: null, place: null },
   startedAt: 0,
   elapsedMs: 0,
   timerInterval: null,
 };
-
 // ============================================================
 //  HELPERS
 // ============================================================
@@ -881,7 +1100,6 @@ function shuffle(arr) {
   }
   return a;
 }
-
 function formatTime(ms) {
   const total = Math.max(0, ms) / 1000;
   const m = Math.floor(total / 60);
@@ -889,12 +1107,10 @@ function formatTime(ms) {
   const t = Math.floor((total * 10) % 10);
   return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0") + "." + t;
 }
-
 function show(screen) {
   ["#screen-start", "#screen-game", "#screen-finish", "#screen-board"]
     .forEach(s => $(s).hidden = (s !== screen));
 }
-
 function placeholderSvg(num) {
   return `
     <svg class="photo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
@@ -916,22 +1132,17 @@ function placeholderSvg(num) {
       </g>
     </svg>`;
 }
-
 // ============================================================
 //  RONDE OPBOUWEN
 // ============================================================
 function buildOptions(field, correct) {
-  // pool = enkel de foto's die in deze ronde meedoen (state.order)
   const inRound = state.order.map(i => PHOTOS[i][field]);
   const allValues = [...new Set(inRound)];
   const pool = allValues.filter(v => v !== correct);
   const wrong = shuffle(pool).slice(0, 2);
-  // als er minder dan 2 alternatieven zijn (heel kleine subset), vul aan met
-  // dummy-waarden zodat er toch 3 keuzes verschijnen
   while (wrong.length < 2) wrong.push("—");
   return shuffle([correct, ...wrong]);
 }
-
 function renderRow(field, options, selected) {
   const wrap = $(`.options[data-field="${field}"]`);
   wrap.innerHTML = "";
@@ -960,30 +1171,25 @@ function pickPhotoUrl(photo) {
 function showPhoto() {
   const photo = PHOTOS[state.order[state.current]];
   const slot = $("#photo-slot");
- const url = pickPhotoUrl(photo);
-
-if (url && url.trim()) {
-  slot.innerHTML = `<img src="${url}" alt="Foto ${photo.year} - ${photo.theme}">`;
-} else {
-  slot.innerHTML = placeholderSvg(state.current + 1);
-}
-
+  const url = pickPhotoUrl(photo);
+  if (url && url.trim()) {
+    slot.innerHTML = `<img src="${url}" alt="Foto ${photo.year} - ${photo.theme}">`;
+  } else {
+    slot.innerHTML = placeholderSvg(state.current + 1);
+  }
   photo._opts = {
     theme: buildOptions("theme", photo.theme),
     year:  buildOptions("year",  photo.year),
     place: buildOptions("place", photo.place),
   };
-
   state.selections = { theme: null, year: null, place: null };
   renderRow("theme", photo._opts.theme, null);
   renderRow("year",  photo._opts.year,  null);
   renderRow("place", photo._opts.place, null);
-
   $("#photo-num").textContent = state.current + 1;
   $("#feedback").textContent = "";
   $("#feedback").className = "feedback";
 }
-
 // ============================================================
 //  CONTROLEREN
 // ============================================================
@@ -1000,7 +1206,6 @@ function check() {
     year:  sel.year  === photo.year,
     place: sel.place === photo.place,
   };
-
   for (const field of ["theme","year","place"]) {
     const wrap = $(`.options[data-field="${field}"]`);
     for (const b of wrap.querySelectorAll(".opt")) {
@@ -1010,7 +1215,6 @@ function check() {
       }
     }
   }
-
   if (ok.theme && ok.year && ok.place) {
     $("#feedback").textContent = "Juist! Op naar de volgende.";
     $("#feedback").className = "feedback good";
@@ -1020,13 +1224,11 @@ function check() {
     $("#feedback").className = "feedback bad";
   }
 }
-
 function nextPhoto() {
   state.current++;
   if (state.current >= state.order.length) finish();
   else showPhoto();
 }
-
 // ============================================================
 //  TIMER
 // ============================================================
@@ -1043,7 +1245,41 @@ function stopTimer() {
   state.timerInterval = null;
   state.elapsedMs = performance.now() - state.startedAt;
 }
+// ============================================================
+//  COUNTDOWN 5 → 0  (full-screen overlay)
+// ============================================================
+let _countdownTimer = null;
+function runCountdown(onDone) {
+  if (_countdownTimer) clearInterval(_countdownTimer);
+  const cd  = $("#screen-countdown");
+  const num = $("#cd-number");
+  cd.hidden = false;
+  cd.setAttribute("aria-hidden", "false");
 
+  let n = Math.max(1, Number(COUNTDOWN_SECONDS) || 5);
+
+  function paint(value) {
+    num.textContent = value;
+    num.classList.remove("tick");
+    // force reflow zodat de keyframe opnieuw start
+    void num.offsetWidth;
+    num.classList.add("tick");
+  }
+  paint(n);
+
+  _countdownTimer = setInterval(() => {
+    n--;
+    if (n < 1) {
+      clearInterval(_countdownTimer);
+      _countdownTimer = null;
+      cd.hidden = true;
+      cd.setAttribute("aria-hidden", "true");
+      onDone();
+      return;
+    }
+    paint(n);
+  }, 1000);
+}
 // ============================================================
 //  GAME FLOW
 // ============================================================
@@ -1052,27 +1288,19 @@ function startGame() {
     alert("photos.js is niet correct geladen of bevat te weinig foto's.");
     return;
   }
-const requested = Number(NUM_PHOTOS) > 0
-  ? Number(NUM_PHOTOS)
-  : window.PHOTOS.length;
-
-const count = Math.min(requested, window.PHOTOS.length);
-
-// alle beschikbare jaren
-const allIndices = window.PHOTOS.map((_, i) => i);
-
-// eerst alle jaren schudden
-const randomYears = shuffle(allIndices);
-
-// daarna slechts count jaren nemen
-state.order = randomYears.slice(0, count);
+  const requested = Number(NUM_PHOTOS) > 0
+    ? Number(NUM_PHOTOS)
+    : window.PHOTOS.length;
+  const count = Math.min(requested, window.PHOTOS.length);
+  const allIndices = window.PHOTOS.map((_, i) => i);
+  const randomYears = shuffle(allIndices);
+  state.order = randomYears.slice(0, count);
   state.current = 0;
   $("#photo-total").textContent = String(count);
   show("#screen-game");
   showPhoto();
   startTimer();
 }
-
 function finish() {
   stopTimer();
   $("#final-time").textContent = formatTime(state.elapsedMs);
@@ -1080,7 +1308,6 @@ function finish() {
   show("#screen-finish");
   setTimeout(() => $("#player-name").focus(), 200);
 }
-
 async function saveAndShow() {
   let name = ($("#player-name").value || "").trim();
   if (!name) { $("#player-name").focus(); return; }
@@ -1091,7 +1318,6 @@ async function saveAndShow() {
   await renderBoard("#board-final", entry);
   show("#screen-board");
 }
-
 // ============================================================
 //  SCOREBORD (Firebase REST + localStorage fallback)
 // ============================================================
@@ -1105,7 +1331,6 @@ function saveLocal(entry) {
   all.push(entry);
   localStorage.setItem(localKey(), JSON.stringify(all));
 }
-
 async function saveScore(entry) {
   if (FIREBASE_URL) {
     const url = FIREBASE_URL.replace(/\/$/, "") + ".json";
@@ -1119,7 +1344,6 @@ async function saveScore(entry) {
     saveLocal(entry);
   }
 }
-
 async function fetchScores() {
   if (FIREBASE_URL) {
     const url = FIREBASE_URL.replace(/\/$/, "") + ".json";
@@ -1135,7 +1359,6 @@ async function fetchScores() {
   }
   return loadLocal();
 }
-
 async function renderBoard(selector, highlight) {
   const all = await fetchScores();
   const top = all
@@ -1160,30 +1383,24 @@ async function renderBoard(selector, highlight) {
     ol.appendChild(li);
   }
 }
-
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   })[c]);
 }
-
 // ============================================================
-//  EVENTS
+//  EVENTS  (Start en Opnieuw spelen → countdown → spel)
 // ============================================================
-$("#btn-start").addEventListener("click", startGame);
+$("#btn-start").addEventListener("click",  () => runCountdown(startGame));
+$("#btn-replay").addEventListener("click", () => runCountdown(startGame));
 $("#btn-check").addEventListener("click", check);
 $("#btn-save").addEventListener("click", saveAndShow);
-$("#btn-replay").addEventListener("click", () => {
-  show("#screen-start");
-  renderBoard("#board-start");
-});
 $("#player-name").addEventListener("keydown", (e) => {
   if (e.key === "Enter") saveAndShow();
 });
 document.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && !$("#screen-game").hidden) check();
 });
-
 renderBoard("#board-start");
 </script>
 </body>
