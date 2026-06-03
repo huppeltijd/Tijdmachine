@@ -1077,6 +1077,104 @@ const FIREBASE_URL = "https://huppeltijd-75cf4-default-rtdb.europe-west1.firebas
 
 //  Hoe lang aftellen (seconden)?  Standaard 5.
 const COUNTDOWN_SECONDS = 5;
+
+//  Geluiden aan/uit
+const SOUND_ENABLED = true;
+// ============================================================
+//  AUDIO  (procedureel, geen externe bestanden nodig)
+// ============================================================
+let _audioCtx = null;
+function getAudioCtx() {
+  if (!SOUND_ENABLED) return null;
+  if (!_audioCtx) {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return null;
+      _audioCtx = new Ctx();
+    } catch { return null; }
+  }
+  if (_audioCtx.state === "suspended") _audioCtx.resume();
+  return _audioCtx;
+}
+
+// klik van een oude metalen schakelaar:
+// kort noise-burst door bandpass + een lichte metallische sinus
+function playMetalClick() {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  const now = ctx.currentTime;
+
+  // 1) noise burst (de "klak")
+  const dur = 0.08;
+  const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * dur), ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) {
+    // snel uitstervende ruis
+    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.012));
+  }
+  const noise = ctx.createBufferSource();
+  noise.buffer = buf;
+  const filt = ctx.createBiquadFilter();
+  filt.type = "bandpass";
+  filt.frequency.value = 2400;
+  filt.Q.value = 1.4;
+  const ng = ctx.createGain();
+  ng.gain.setValueAtTime(0.35, now);
+  ng.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+  noise.connect(filt).connect(ng).connect(ctx.destination);
+  noise.start(now);
+
+  // 2) korte metallische resonantie (sinus)
+  const osc = ctx.createOscillator();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(1700, now);
+  osc.frequency.exponentialRampToValueAtTime(1300, now + 0.05);
+  const og = ctx.createGain();
+  og.gain.setValueAtTime(0.16, now);
+  og.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+  osc.connect(og).connect(ctx.destination);
+  osc.start(now);
+  osc.stop(now + 0.09);
+}
+
+// klok-tik: kort tik-tak afwisselend hoog/laag
+let _tickHigh = false;
+function playClockTick() {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  const now = ctx.currentTime;
+  _tickHigh = !_tickHigh;
+  const freq = _tickHigh ? 2200 : 1600; // tick / tock
+
+  const dur = 0.06;
+  const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * dur), ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) {
+    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.006));
+  }
+  const noise = ctx.createBufferSource();
+  noise.buffer = buf;
+  const filt = ctx.createBiquadFilter();
+  filt.type = "bandpass";
+  filt.frequency.value = freq;
+  filt.Q.value = 2.4;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.55, now);
+  g.gain.exponentialRampToValueAtTime(0.001, now + 0.055);
+  noise.connect(filt).connect(g).connect(ctx.destination);
+  noise.start(now);
+
+  // korte houten "tok" eronder voor body
+  const osc = ctx.createOscillator();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(_tickHigh ? 600 : 460, now);
+  const og = ctx.createGain();
+  og.gain.setValueAtTime(0.18, now);
+  og.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+  osc.connect(og).connect(ctx.destination);
+  osc.start(now);
+  osc.stop(now + 0.06);
+}
 // ============================================================
 //  STATE
 // ============================================================
@@ -1088,6 +1186,7 @@ const state = {
   startedAt: 0,
   elapsedMs: 0,
   timerInterval: null,
+  tickInterval: null,
 };
 // ============================================================
 //  HELPERS
@@ -1239,10 +1338,15 @@ function startTimer() {
     state.elapsedMs = performance.now() - state.startedAt;
     $("#timer").textContent = formatTime(state.elapsedMs);
   }, 100);
+  // klok blijft tikken (ritme loopt door vanuit de countdown)
+  if (state.tickInterval) clearInterval(state.tickInterval);
+  state.tickInterval = setInterval(playClockTick, 1000);
 }
 function stopTimer() {
   if (state.timerInterval) clearInterval(state.timerInterval);
   state.timerInterval = null;
+  if (state.tickInterval) clearInterval(state.tickInterval);
+  state.tickInterval = null;
   state.elapsedMs = performance.now() - state.startedAt;
 }
 // ============================================================
@@ -1257,6 +1361,7 @@ function runCountdown(onDone) {
   cd.setAttribute("aria-hidden", "false");
 
   let n = Math.max(1, Number(COUNTDOWN_SECONDS) || 5);
+  _tickHigh = false;  // ritme begint met "hoge" tik
 
   function paint(value) {
     num.textContent = value;
@@ -1264,6 +1369,7 @@ function runCountdown(onDone) {
     // force reflow zodat de keyframe opnieuw start
     void num.offsetWidth;
     num.classList.add("tick");
+    playClockTick();
   }
   paint(n);
 
@@ -1272,9 +1378,13 @@ function runCountdown(onDone) {
     if (n < 1) {
       clearInterval(_countdownTimer);
       _countdownTimer = null;
-      cd.hidden = true;
-      cd.setAttribute("aria-hidden", "true");
-      onDone();
+      // EERST het spelscherm tonen, achter de overlay,
+      // dan pas de overlay verbergen → geen flits van beginscherm.
+      try { onDone(); } catch (e) { console.error(e); }
+      requestAnimationFrame(() => {
+        cd.hidden = true;
+        cd.setAttribute("aria-hidden", "true");
+      });
       return;
     }
     paint(n);
@@ -1401,6 +1511,15 @@ $("#player-name").addEventListener("keydown", (e) => {
 document.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && !$("#screen-game").hidden) check();
 });
+
+// klik-geluid op elke knop of optie (delegated, ook bij toetsenbord-Enter)
+document.addEventListener("click", (e) => {
+  if (e.target.closest(".btn, .opt")) playMetalClick();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") playMetalClick();
+});
+
 renderBoard("#board-start");
 </script>
 </body>
