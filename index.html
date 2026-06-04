@@ -721,6 +721,9 @@
   </defs>
   <rect width="100%" height="100%" fill="url(#cogtile)"/>
 </svg>
+<!-- ============ ACHTERGRONDMUZIEK (loop) ============ -->
+<audio id="bg-music" src="music_intro.mp3" preload="auto" loop></audio>
+
 <!-- ============ SPLASH ============ -->
 <section id="screen-splash">
   <div class="stars" aria-hidden="true">
@@ -1334,6 +1337,101 @@ function playTimeWarp(durSec = 5) {
   ping.start(end - 0.35); ping.stop(end + 0.4);
 }
 
+// "ting" bij juist antwoord: heldere bel-sinus die snel uitsterft
+function playTing() {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  if (ctx.state === "suspended") { try { ctx.resume(); } catch {} }
+  const now = ctx.currentTime;
+  // hoofdtoon
+  const tones = [
+    { freq: 2640, gain: 0.32, dur: 0.85 },  // hoog tikje
+    { freq: 1760, gain: 0.22, dur: 1.0  },  // octaaf eronder
+    { freq: 3520, gain: 0.12, dur: 0.6  },  // glittertje boven
+  ];
+  for (const t of tones) {
+    const osc = ctx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(t.freq, now);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0, now);
+    g.gain.linearRampToValueAtTime(t.gain, now + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.001, now + t.dur);
+    osc.connect(g).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + t.dur + 0.05);
+  }
+}
+
+// applaus bij voltooien: gelaagde klap-bursts in een crescendo
+function playApplause(durSec = 3.5) {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  if (ctx.state === "suspended") { try { ctx.resume(); } catch {} }
+  const now = ctx.currentTime;
+  const master = ctx.createGain();
+  master.gain.setValueAtTime(0.001, now);
+  master.gain.exponentialRampToValueAtTime(0.55, now + 0.3);
+  master.gain.linearRampToValueAtTime(0.55, now + durSec * 0.6);
+  master.gain.exponentialRampToValueAtTime(0.001, now + durSec);
+  master.connect(ctx.destination);
+
+  // achtergrond-ruis (mensenmassa) door bandpass
+  const bgBuf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * (durSec + 0.4)), ctx.sampleRate);
+  const bgData = bgBuf.getChannelData(0);
+  for (let i = 0; i < bgData.length; i++) bgData[i] = (Math.random() * 2 - 1) * 0.6;
+  const bgSrc = ctx.createBufferSource();
+  bgSrc.buffer = bgBuf;
+  const bgF = ctx.createBiquadFilter();
+  bgF.type = "bandpass";
+  bgF.frequency.value = 1800;
+  bgF.Q.value = 0.8;
+  const bgG = ctx.createGain();
+  bgG.gain.value = 0.5;
+  bgSrc.connect(bgF).connect(bgG).connect(master);
+  bgSrc.start(now); bgSrc.stop(now + durSec + 0.3);
+
+  // individuele klappen: korte gefilterde ruisbursts
+  const clapCount = Math.floor(durSec * 22); // ~22 klappen per seconde
+  for (let i = 0; i < clapCount; i++) {
+    const t = now + Math.random() * durSec;
+    const len = 0.04 + Math.random() * 0.05;
+    const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * len), ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let j = 0; j < data.length; j++) {
+      data[j] = (Math.random() * 2 - 1) * Math.exp(-j / (ctx.sampleRate * 0.008));
+    }
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const f = ctx.createBiquadFilter();
+    f.type = "bandpass";
+    f.frequency.value = 1500 + Math.random() * 2200;
+    f.Q.value = 1.5;
+    const g = ctx.createGain();
+    g.gain.value = 0.35 + Math.random() * 0.45;
+    src.connect(f).connect(g).connect(master);
+    src.start(t); src.stop(t + len + 0.02);
+  }
+}
+
+// achtergrondmuziek (10s loop)
+const MUSIC_VOLUME = 0.45;
+function startMusic() {
+  const m = document.getElementById("bg-music");
+  if (!m) return;
+  m.volume = MUSIC_VOLUME;
+  try {
+    m.currentTime = 0;
+    const p = m.play();
+    if (p && typeof p.catch === "function") p.catch(() => {});
+  } catch {}
+}
+function stopMusic() {
+  const m = document.getElementById("bg-music");
+  if (!m) return;
+  try { m.pause(); } catch {}
+}
+
 // klok-tik: kort tik-tak afwisselend hoog/laag
 let _tickHigh = false;
 function playClockTick() {
@@ -1514,6 +1612,7 @@ function check() {
   if (ok.theme && ok.year && ok.place) {
     $("#feedback").textContent = "Juist! Op naar de volgende.";
     $("#feedback").className = "feedback good";
+    playTing();
     setTimeout(nextPhoto, 600);
   } else {
     $("#feedback").textContent = "Nog niet alles juist — pas je antwoord aan.";
@@ -1629,6 +1728,7 @@ function finish() {
   $("#final-time").textContent = formatTime(state.elapsedMs);
   $("#player-name").value = "";
   show("#screen-finish");
+  playApplause();
   setTimeout(() => $("#player-name").focus(), 200);
 }
 async function saveAndShow() {
@@ -1640,6 +1740,7 @@ async function saveAndShow() {
   catch (e) { console.warn("Score opslaan mislukt, val terug op lokaal:", e); saveLocal(entry); }
   await renderBoard("#board-final", entry);
   show("#screen-board");
+  startMusic();
 }
 // ============================================================
 //  SCOREBORD (Firebase REST + localStorage fallback)
@@ -1722,9 +1823,10 @@ $("#btn-enter").addEventListener("click", () => {
   $("#screen-splash").hidden = true;
   $("#screen-start").hidden = false;
   playTimeWarp();
+  startMusic();
 });
-$("#btn-start").addEventListener("click",  () => runCountdown(startGame));
-$("#btn-replay").addEventListener("click", () => runCountdown(startGame));
+$("#btn-start").addEventListener("click",  () => { stopMusic(); runCountdown(startGame); });
+$("#btn-replay").addEventListener("click", () => { stopMusic(); runCountdown(startGame); });
 $("#btn-check").addEventListener("click", check);
 $("#btn-save").addEventListener("click", saveAndShow);
 $("#player-name").addEventListener("keydown", (e) => {
