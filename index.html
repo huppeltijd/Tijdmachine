@@ -656,6 +656,17 @@
     .center { text-align: center; }
     .mt { margin-top: 22px; }
     .small { font-size: 13px; color: #b8d6e1; }
+    /* starts-teller in dezelfde brass-stijl als de h-titels */
+    .start-count {
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: 18px;
+      letter-spacing: .03em;
+      color: var(--brass);
+      text-shadow:
+        0 1px 0 #000,
+        0 2px 8px rgba(0,0,0,.6),
+        0 0 22px rgba(230,184,90,.35);
+    }
     [hidden] { display: none !important; }
     @media (max-width: 640px) {
       .wrap { padding: 20px 12px 60px; }
@@ -937,6 +948,7 @@
       <span class="rivet-bl"></span><span class="rivet-br"></span>
     </div>
     <h2 class="center mt">Top 20 snelste tijden</h2>
+    <p class="center start-count" style="margin:4px 0 12px;"></p>
     <ol class="board" id="board-start"><li class="empty">Scorebord laden…</li></ol>
   </section>
   <!-- ============ GAME ============ -->
@@ -1009,6 +1021,7 @@
   <!-- ============ BOARD ============ -->
   <section id="screen-board" hidden>
     <h1>Top 10 snelste tijden</h1>
+    <p class="center small start-count" style="opacity:.7; margin:0 0 8px;"></p>
     <ol class="board" id="board-final"><li class="empty">Scorebord laden…</li></ol>
     <div class="actions">
       <button class="btn" id="btn-replay">Opnieuw spelen</button>
@@ -1739,6 +1752,7 @@ async function saveAndShow() {
   try { await saveScore(entry); }
   catch (e) { console.warn("Score opslaan mislukt, val terug op lokaal:", e); saveLocal(entry); }
   await renderBoard("#board-final", entry);
+  updateStartCount();
   show("#screen-board");
   startMusic();
 }
@@ -1819,6 +1833,63 @@ function escapeHtml(s) {
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   })[c]);
 }
+
+// ============================================================
+//  TELLER: hoeveel keer is de tijdmachine al gestart
+// ============================================================
+//  Beginaantal (offset) — wordt opgeteld bij wat in Firebase staat.
+//  Handig om met een symbolisch startgetal te beginnen i.p.v. nul.
+const STARTS_BASE = 56;
+
+function firebaseBase() {
+  if (!FIREBASE_URL) return "";
+  // strip de laatste sub-pad (bv "/scores") zodat we /starts kunnen aanspreken
+  return FIREBASE_URL.replace(/\/[^/]+\/?$/, "");
+}
+function localStartsKey() { return "teletijd_starts_v1"; }
+
+async function recordStart() {
+  const base = firebaseBase();
+  if (base) {
+    try {
+      await fetch(base + "/starts.json", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ at: Date.now() }),
+      });
+    } catch (e) { console.warn("Start tellen mislukt:", e); }
+  } else {
+    // lokaal: tel gewoon op
+    const n = (parseInt(localStorage.getItem(localStartsKey()) || "0", 10) || 0) + 1;
+    localStorage.setItem(localStartsKey(), String(n));
+  }
+}
+
+async function fetchStartCount() {
+  const base = firebaseBase();
+  if (base) {
+    try {
+      // ?shallow=true geeft enkel de top-level sleutels terug; goedkoop om te tellen
+      const r = await fetch(base + "/starts.json?shallow=true");
+      const data = await r.json();
+      if (!data || typeof data !== "object") return 0;
+      return Object.keys(data).length;
+    } catch (e) {
+      console.warn("Start-teller lezen mislukt:", e);
+      return parseInt(localStorage.getItem(localStartsKey()) || "0", 10) || 0;
+    }
+  }
+  return parseInt(localStorage.getItem(localStartsKey()) || "0", 10) || 0;
+}
+
+async function updateStartCount() {
+  const n = await fetchStartCount();
+  const total = n + (Number(STARTS_BASE) || 0);
+  const txt = total > 0
+    ? `De tijdmachine werd al ${total.toLocaleString("nl-BE")} keer geactiveerd.`
+    : "";
+  document.querySelectorAll(".start-count").forEach(el => { el.textContent = txt; });
+}
 // ============================================================
 //  EVENTS  (Splash → assemblage+warp → start → countdown → spel)
 // ============================================================
@@ -1832,8 +1903,8 @@ $("#btn-enter").addEventListener("click", () => {
   playTimeWarp();
   startMusic();
 });
-$("#btn-start").addEventListener("click",  () => { stopMusic(); runCountdown(startGame); });
-$("#btn-replay").addEventListener("click", () => { stopMusic(); runCountdown(startGame); });
+$("#btn-start").addEventListener("click",  () => { recordStart(); stopMusic(); runCountdown(startGame); });
+$("#btn-replay").addEventListener("click", () => { recordStart(); stopMusic(); runCountdown(startGame); });
 $("#btn-check").addEventListener("click", check);
 $("#btn-save").addEventListener("click", saveAndShow);
 $("#player-name").addEventListener("keydown", (e) => {
@@ -1852,6 +1923,7 @@ document.addEventListener("keydown", (e) => {
 });
 
 renderBoard("#board-start");
+updateStartCount();
 </script>
 </body>
 </html>
