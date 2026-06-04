@@ -1785,10 +1785,17 @@ async function fetchScores() {
 }
 async function renderBoard(selector, highlight) {
   const all = await fetchScores();
-  const top = all
-    .filter(s => s && typeof s.ms === "number" && s.name)
-    .sort((a, b) => a.ms - b.ms)
-    .slice(0, 20);
+  // sorteer op tijd, dedupliceer per naam (eerste = snelste blijft over)
+  const seen = new Set();
+  const top = [];
+  for (const s of all.filter(x => x && typeof x.ms === "number" && x.name)
+                     .sort((a, b) => a.ms - b.ms)) {
+    const key = s.name.trim().toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    top.push(s);
+    if (top.length >= 20) break;
+  }
   const ol = $(selector);
   ol.innerHTML = "";
   if (top.length === 0) {
