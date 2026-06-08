@@ -307,7 +307,7 @@
       padding: 14px 34px;
       font: inherit;
       font-weight: bold;
-      font-size: 16px;
+      font-size: 18px;
       letter-spacing: .1em;
       text-transform: uppercase;
       box-shadow:
@@ -656,6 +656,41 @@
     .center { text-align: center; }
     .mt { margin-top: 22px; }
     .small { font-size: 13px; color: #b8d6e1; }
+    /* admin-paneel (zichtbaar wanneer URL ?admin bevat) */
+    #screen-admin { max-width: 980px; margin: 0 auto; padding: 24px 16px 60px; }
+    .admin-actions { display: flex; gap: 8px; justify-content: center; margin: 14px 0 24px; flex-wrap: wrap; }
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(10,37,48,.65);
+      border: 2px solid var(--brass-deep);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .admin-table th, .admin-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid rgba(230,184,90,.18);
+      text-align: left;
+      color: var(--paper);
+    }
+    .admin-table th { color: var(--brass); font-family: "Playfair Display", Georgia, serif; }
+    .admin-table tr:last-child td { border-bottom: none; }
+    .admin-table tr.pending { background: rgba(213,104,73,.10); }
+    .admin-table tr.approved { background: rgba(126,196,107,.08); }
+    .admin-table .time { font-family: "Courier New", monospace; }
+    .admin-table .mini-btn {
+      appearance: none; cursor: pointer;
+      background: linear-gradient(180deg, #f4d27f 0%, #c89030 55%, #8a5c1c 100%);
+      color: var(--ink); border: 2px solid var(--copper-deep);
+      border-radius: 5px; padding: 6px 12px;
+      font: inherit; font-weight: bold; font-size: 13px;
+      letter-spacing: .06em; text-transform: uppercase;
+    }
+    .admin-table .mini-btn.revoke {
+      background: linear-gradient(180deg, #d8a087 0%, #a05a3a 55%, #6a2c14 100%);
+      color: #fff;
+    }
+    .admin-stats { color: var(--brass); text-align: center; margin: 0 0 12px; font-family: "Playfair Display", Georgia, serif; }
     /* starts-teller in dezelfde brass-stijl als de h-titels */
     .start-count {
       font-family: "Playfair Display", Georgia, serif;
@@ -940,11 +975,10 @@
     </div>
     <div class="plaque">
       <p>Bij elke foto kies je het juiste <b>thema</b>, <b>jaartal</b> en de juiste <b>plaats</b>.
-        Heb je alle drie juist, dan reis je verder door de HuPPelTijd. De klok tikt door...
-        Na 10 juiste foto's finish je en kom je misschien op het scorebord. Als je op tijd bent...
-        En anders probeer je opnieuw en opnieuw, maar je reis zal nooit dezelfde zijn.</p>
+        Heb je alle drie juist, dan reis je verder door de HuPPelTijd-geschiedenis. De klok tikt door.
+        Na 10 juiste foto's finish je en kom je misschien op het scorebord. Als je op tijd bent...</p>
       <div class="actions">
-        <button class="btn" id="btn-start">Start tijdmachine</button>
+        <button class="btn" id="btn-start">Start de tijdreis</button>
       </div>
       <span class="rivet-bl"></span><span class="rivet-br"></span>
     </div>
@@ -1032,6 +1066,30 @@
     Een HuPPelTijd-spel 2026
   </p>
 </div>
+
+<!-- ============ ADMIN PANEEL (zichtbaar via ?admin in URL) ============ -->
+<section id="screen-admin" hidden>
+  <h1>Admin · scorebord-beheer</h1>
+  <p class="subtitle">Goedgekeurde namen verschijnen in de publieke top 20. Nieuwe namen blijven verborgen tot je ze hier toelaat.</p>
+  <p class="admin-stats" id="admin-stats">Laden…</p>
+  <div class="admin-actions">
+    <button class="btn" id="admin-refresh">Vernieuwen</button>
+    <button class="btn" id="admin-back">← Terug naar spel</button>
+  </div>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Naam</th>
+        <th>Beste tijd</th>
+        <th>Pogingen</th>
+        <th style="text-align:right;">Status</th>
+      </tr>
+    </thead>
+    <tbody id="admin-list">
+      <tr><td colspan="4" style="text-align:center; font-style:italic; opacity:.7;">Laden…</td></tr>
+    </tbody>
+  </table>
+</section>
 
 <!-- ============ FULL-SCREEN COUNTDOWN OVERLAY ============ -->
 <section id="screen-countdown" hidden aria-hidden="true">
@@ -1799,13 +1857,14 @@ async function fetchScores() {
   return loadLocal();
 }
 async function renderBoard(selector, highlight) {
-  const all = await fetchScores();
-  // sorteer op tijd, dedupliceer per naam (eerste = snelste blijft over)
+  const [all, approved] = await Promise.all([fetchScores(), fetchApprovedNames()]);
+  // sorteer op tijd, dedupliceer per naam, toon enkel goedgekeurde namen
   const seen = new Set();
   const top = [];
   for (const s of all.filter(x => x && typeof x.ms === "number" && x.name)
                      .sort((a, b) => a.ms - b.ms)) {
     const key = s.name.trim().toLowerCase();
+    if (!approved.has(key)) continue;        // wachtkamer: nog niet getoond
     if (seen.has(key)) continue;
     seen.add(key);
     top.push(s);
@@ -1833,6 +1892,52 @@ function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   })[c]);
+}
+
+// ============================================================
+//  GOEDGEKEURDE NAMEN  (wie zichtbaar is in de top 20)
+// ============================================================
+async function fetchApprovedNames() {
+  const base = firebaseBase();
+  if (!base) {
+    try { return new Set(JSON.parse(localStorage.getItem("teletijd_approved_v1") || "[]")); }
+    catch { return new Set(); }
+  }
+  try {
+    const r = await fetch(base + "/approved_names.json");
+    const data = await r.json();
+    if (!data || typeof data !== "object") return new Set();
+    return new Set(Object.keys(data));
+  } catch (e) {
+    console.warn("Goedgekeurde namen lezen mislukt:", e);
+    return new Set();
+  }
+}
+async function setApproved(nameKey, approved) {
+  const base = firebaseBase();
+  // Firebase staat geen punten of #/$/[/]/ in keys; we encoderen voor safety
+  const safeKey = nameKey.replace(/[.$#\[\]\/]/g, "_");
+  if (base) {
+    try {
+      if (approved) {
+        await fetch(`${base}/approved_names/${encodeURIComponent(safeKey)}.json`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(true),
+        });
+      } else {
+        await fetch(`${base}/approved_names/${encodeURIComponent(safeKey)}.json`, {
+          method: "DELETE",
+        });
+      }
+    } catch (e) { console.warn("Goedkeuring schrijven mislukt:", e); }
+  } else {
+    let cur = [];
+    try { cur = JSON.parse(localStorage.getItem("teletijd_approved_v1") || "[]"); } catch {}
+    const s = new Set(cur);
+    if (approved) s.add(safeKey); else s.delete(safeKey);
+    localStorage.setItem("teletijd_approved_v1", JSON.stringify([...s]));
+  }
 }
 
 // ============================================================
@@ -1923,8 +2028,85 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Enter") playMetalClick();
 });
 
-renderBoard("#board-start");
-updateStartCount();
+// ============================================================
+//  ADMIN-PANEEL  (open via ?admin in URL)
+// ============================================================
+async function renderAdminList() {
+  $("#admin-stats").textContent = "Laden…";
+  const [all, approved] = await Promise.all([fetchScores(), fetchApprovedNames()]);
+
+  // Groepeer per genormaliseerde naam (lower-case, getrimd, safe key)
+  const groups = new Map();
+  for (const s of all) {
+    if (!s || typeof s.ms !== "number" || !s.name) continue;
+    const display = String(s.name).trim();
+    const key = display.toLowerCase().replace(/[.$#\[\]\/]/g, "_");
+    if (!groups.has(key)) groups.set(key, { name: display, key, scores: [] });
+    groups.get(key).scores.push(s);
+  }
+  const rows = [...groups.values()].map(g => ({
+    ...g,
+    best: Math.min(...g.scores.map(x => x.ms)),
+    count: g.scores.length,
+    approved: approved.has(g.key),
+  })).sort((a, b) => a.best - b.best);
+
+  const approvedCount = rows.filter(r => r.approved).length;
+  const pendingCount  = rows.length - approvedCount;
+  $("#admin-stats").textContent =
+    `${rows.length} unieke spelers · ${approvedCount} goedgekeurd · ${pendingCount} in afwachting`;
+
+  const tbody = $("#admin-list");
+  tbody.innerHTML = "";
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; font-style:italic; opacity:.7;">Nog geen scores.</td></tr>`;
+    return;
+  }
+  for (const row of rows) {
+    const tr = document.createElement("tr");
+    tr.className = row.approved ? "approved" : "pending";
+    tr.innerHTML = `
+      <td>${escapeHtml(row.name)}</td>
+      <td class="time">${formatTime(row.best)}</td>
+      <td>${row.count}</td>
+      <td style="text-align:right;">
+        <button class="mini-btn ${row.approved ? "revoke" : ""}" data-key="${escapeHtml(row.key)}" data-state="${row.approved ? "1" : "0"}">
+          ${row.approved ? "Intrekken" : "Goedkeuren"}
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  }
+  tbody.querySelectorAll("button.mini-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      btn.disabled = true;
+      btn.textContent = "…";
+      await setApproved(btn.dataset.key, btn.dataset.state !== "1");
+      await renderAdminList();
+    });
+  });
+}
+
+function openAdmin() {
+  // verberg alles behalve de admin-sectie
+  ["#screen-splash", "#screen-start", "#screen-game", "#screen-finish",
+   "#screen-board", "#screen-countdown"].forEach(s => {
+    const el = $(s); if (el) el.hidden = true;
+  });
+  $("#screen-admin").hidden = false;
+  stopMusic();
+  renderAdminList();
+}
+$("#admin-refresh").addEventListener("click", renderAdminList);
+$("#admin-back").addEventListener("click", () => { location.search = ""; });
+
+const isAdmin = new URLSearchParams(location.search).has("admin");
+if (isAdmin) {
+  openAdmin();
+} else {
+  renderBoard("#board-start");
+  updateStartCount();
+}
 </script>
 </body>
 </html>
