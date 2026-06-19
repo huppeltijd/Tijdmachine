@@ -1973,33 +1973,40 @@ function escapeHtml(s) {
 // ============================================================
 //  GOEDGEKEURDE NAMEN  (wie zichtbaar is in de top 20)
 // ============================================================
+// Retourneert een Map van key → display-naam.
+// (Compatible met oude entries waar de waarde true was: dan key als fallback.)
 async function fetchApprovedNames() {
   const base = firebaseBase();
   if (!base) {
-    try { return new Set(JSON.parse(localStorage.getItem("teletijd_approved_v1") || "[]")); }
-    catch { return new Set(); }
+    try {
+      const arr = JSON.parse(localStorage.getItem("teletijd_approved_v1") || "[]");
+      return new Map(arr.map(k => [k, k]));
+    } catch { return new Map(); }
   }
   try {
     const r = await fetch(base + "/approved_names.json");
     const data = await r.json();
-    if (!data || typeof data !== "object") return new Set();
-    return new Set(Object.keys(data));
+    if (!data || typeof data !== "object") return new Map();
+    const m = new Map();
+    for (const [k, v] of Object.entries(data)) {
+      m.set(k, typeof v === "string" && v.trim() ? v : k);
+    }
+    return m;
   } catch (e) {
     console.warn("Goedgekeurde namen lezen mislukt:", e);
-    return new Set();
+    return new Map();
   }
 }
-async function setApproved(nameKey, approved) {
-  const base = firebaseBase();
-  // Firebase staat geen punten of #/$/[/]/ in keys; we encoderen voor safety
+async function setApproved(nameKey, approved, displayName) {
   const safeKey = nameKey.replace(/[.$#\[\]\/]/g, "_");
+  const base = firebaseBase();
   if (base) {
     try {
       if (approved) {
         await fetch(`${base}/approved_names/${encodeURIComponent(safeKey)}.json`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(true),
+          body: JSON.stringify(displayName || safeKey),
         });
       } else {
         await fetch(`${base}/approved_names/${encodeURIComponent(safeKey)}.json`, {
@@ -2120,22 +2127,33 @@ async function renderAdminList() {
     if (!groups.has(key)) groups.set(key, { name: display, key, scores: [] });
     groups.get(key).scores.push(s);
   }
+  // Voeg ook approved namen toe die (nog) geen scores hebben
+  for (const [key, displayName] of approved) {
+    if (!groups.has(key)) groups.set(key, { name: displayName, key, scores: [] });
+  }
+
   const rows = [...groups.values()].map(g => ({
     ...g,
-    best: Math.min(...g.scores.map(x => x.ms)),
+    best: g.scores.length ? Math.min(...g.scores.map(x => x.ms)) : null,
     count: g.scores.length,
     approved: approved.has(g.key),
-  })).sort((a, b) => a.best - b.best);
+  })).sort((a, b) => {
+    // 1) approved met tijd, op tijd; 2) approved zonder tijd; 3) in afwachting alfabetisch
+    if (a.best != null && b.best != null) return a.best - b.best;
+    if (a.best != null) return -1;
+    if (b.best != null) return 1;
+    return a.name.localeCompare(b.name);
+  });
 
   const approvedCount = rows.filter(r => r.approved).length;
   const pendingCount  = rows.length - approvedCount;
   $("#admin-stats").textContent =
-    `${rows.length} unieke spelers · ${approvedCount} goedgekeurd · ${pendingCount} in afwachting`;
+    `${rows.length} unieke namen · ${approvedCount} goedgekeurd · ${pendingCount} in afwachting`;
 
   const tbody = $("#admin-list");
   tbody.innerHTML = "";
   if (rows.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; font-style:italic; opacity:.7;">Nog geen scores.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; font-style:italic; opacity:.7;">Nog niets te tonen.</td></tr>`;
     return;
   }
   for (const row of rows) {
@@ -2143,10 +2161,10 @@ async function renderAdminList() {
     tr.className = row.approved ? "approved" : "pending";
     tr.innerHTML = `
       <td>${escapeHtml(row.name)}</td>
-      <td class="time">${formatTime(row.best)}</td>
+      <td class="time">${row.best != null ? formatTime(row.best) : "<span style='opacity:.5;'>—</span>"}</td>
       <td>${row.count}</td>
       <td style="text-align:right;">
-        <button class="mini-btn ${row.approved ? "revoke" : ""}" data-key="${escapeHtml(row.key)}" data-state="${row.approved ? "1" : "0"}">
+        <button class="mini-btn ${row.approved ? "revoke" : ""}" data-key="${escapeHtml(row.key)}" data-name="${escapeHtml(row.name)}" data-state="${row.approved ? "1" : "0"}">
           ${row.approved ? "Intrekken" : "Goedkeuren"}
         </button>
       </td>
@@ -2157,7 +2175,8 @@ async function renderAdminList() {
     btn.addEventListener("click", async () => {
       btn.disabled = true;
       btn.textContent = "…";
-      await setApproved(btn.dataset.key, btn.dataset.state !== "1");
+      const isApproved = btn.dataset.state === "1";
+      await setApproved(btn.dataset.key, !isApproved, btn.dataset.name);
       await renderAdminList();
     });
   });
