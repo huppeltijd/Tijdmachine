@@ -40,7 +40,7 @@
       overflow-x: hidden;
     }
     /* ============================================================
-       ACHTERGRONDPATROON  (klokken + tandwiele)
+       ACHTERGRONDPATROON  (klokken + tandwielen)
     ============================================================ */
     .bg-pattern {
       position: fixed; inset: 0;
@@ -1102,6 +1102,7 @@
   <p class="admin-stats" id="admin-stats">Laden…</p>
   <div class="admin-actions">
     <button class="btn" id="admin-refresh">Vernieuwen</button>
+    <button class="btn" id="admin-reset" style="background:linear-gradient(180deg,#d8a087 0%,#a05a3a 55%,#6a2c14 100%);color:#fff;">Reset alle scores</button>
     <button class="btn" id="admin-back">← Terug naar spel</button>
   </div>
   <table class="admin-table">
@@ -2173,6 +2174,26 @@ function openAdmin() {
   renderAdminList();
 }
 $("#admin-refresh").addEventListener("click", renderAdminList);
+$("#admin-reset").addEventListener("click", async () => {
+  if (!confirm("Alle scores wissen?\n\nDe goedgekeurde namen blijven bewaard — enkel de gespeelde tijden verdwijnen.")) return;
+  const btn = $("#admin-reset");
+  btn.disabled = true; const orig = btn.textContent; btn.textContent = "Wissen…";
+  const base = firebaseBase();
+  if (base) {
+    try {
+      const r = await fetch(base + "/scores.json", { method: "DELETE" });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+    } catch (e) {
+      alert("Scores wissen mislukt: " + e.message + "\n\nCheck of je Firebase-regels delete op /scores toelaten (zie tekst onder de tabel).");
+      btn.disabled = false; btn.textContent = orig;
+      return;
+    }
+  } else {
+    localStorage.removeItem("teletijd_scores_v1");
+  }
+  btn.disabled = false; btn.textContent = orig;
+  await renderAdminList();
+});
 $("#admin-back").addEventListener("click", () => {
   // verwijder zowel ?admin als #admin uit URL en herlaad
   const cleanUrl = location.origin + location.pathname;
