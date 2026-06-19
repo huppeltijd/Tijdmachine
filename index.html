@@ -226,6 +226,34 @@
   margin: 0 auto;
   background: #0a2530;
 }
+/* foto-onthulling: 10x10 raster van tegels dat geleidelijk wegfadet */
+.photo-wrap {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  max-width: 100%;
+  line-height: 0; /* geen extra ruimte onder img */
+}
+.reveal-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+  pointer-events: none;
+  /* subtiele rand-textuur, zichtbaar zolang tegels gesloten */
+  background: transparent;
+}
+.reveal-grid .tile {
+  background: #0a2530;
+  box-shadow:
+    inset 0 0 0 1px rgba(230,184,90,.08);
+  transition: opacity .55s ease-out, transform .55s ease-out;
+}
+.reveal-grid .tile.gone {
+  opacity: 0;
+  transform: scale(.9);
+}
     /* ============================================================
        VRAAGRIJEN
     ============================================================ */
@@ -246,8 +274,8 @@
     }
     .options {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
     }
     .opt {
       appearance: none;
@@ -1230,6 +1258,9 @@
 //  Hoeveel foto's per ronde?
 const NUM_PHOTOS = 10;
 
+//  Aantal keuzes per categorie (thema / jaartal / plaats). 3, 4 of 5 werkt mooi.
+const NUM_CHOICES = 5;
+
 //  Gedeeld scorebord via Firebase Realtime Database.
 const FIREBASE_URL = "https://huppeltijd-75cf4-default-rtdb.europe-west1.firebasedatabase.app/scores";
 
@@ -1554,7 +1585,8 @@ const state = {
   elapsedMs: 0,
   timerInterval: null,
   tickInterval: null,
-  processing: false,   // true tussen een juist antwoord en het laden van de volgende foto
+  processing: false,
+  revealTimers: [],
 };
 // ============================================================
 //  HELPERS
@@ -1603,11 +1635,13 @@ function placeholderSvg(num) {
 //  RONDE OPBOUWEN
 // ============================================================
 function buildOptions(field, correct) {
-  const inRound = state.order.map(i => PHOTOS[i][field]);
-  const allValues = [...new Set(inRound)];
+  // totaal aantal opties stuurbaar via NUM_CHOICES (minimum 2)
+  const need = Math.max(2, Number(NUM_CHOICES) || 3);
+  // foute antwoorden mogen uit ALLE 30 entries komen, niet enkel uit de ronde
+  const allValues = [...new Set(PHOTOS.map(p => p[field]))];
   const pool = allValues.filter(v => v !== correct);
-  const wrong = shuffle(pool).slice(0, 2);
-  while (wrong.length < 2) wrong.push("—");
+  const wrong = shuffle(pool).slice(0, need - 1);
+  while (wrong.length < need - 1) wrong.push("—");
   return shuffle([correct, ...wrong]);
 }
 function renderRow(field, options, selected) {
@@ -1635,15 +1669,44 @@ function pickPhotoUrl(photo) {
   }
   return photo.url || "";
 }
+// reveal: vooraf gegenereerde 100 tegels in een grid
+function buildRevealGrid() {
+  let html = '<div class="reveal-grid" id="reveal-grid">';
+  for (let i = 0; i < 100; i++) html += '<div class="tile"></div>';
+  return html + "</div>";
+}
+function cancelReveal() {
+  if (state.revealTimers && state.revealTimers.length) {
+    state.revealTimers.forEach(t => clearTimeout(t));
+  }
+  state.revealTimers = [];
+}
+function startReveal(durationSec = 10) {
+  cancelReveal();
+  const grid = document.getElementById("reveal-grid");
+  if (!grid) return;
+  const tiles = Array.from(grid.children);
+  const indices = shuffle(tiles.map((_, i) => i));
+  const stepMs = (durationSec * 1000) / tiles.length;
+  for (let i = 0; i < indices.length; i++) {
+    const tile = tiles[indices[i]];
+    const id = setTimeout(() => {
+      if (tile.isConnected) tile.classList.add("gone");
+    }, i * stepMs);
+    state.revealTimers.push(id);
+  }
+}
+
 function showPhoto() {
   const photo = PHOTOS[state.order[state.current]];
   const slot = $("#photo-slot");
   const url = pickPhotoUrl(photo);
-  if (url && url.trim()) {
-    slot.innerHTML = `<img src="${url}" alt="Foto ${photo.year} - ${photo.theme}">`;
-  } else {
-    slot.innerHTML = placeholderSvg(state.current + 1);
-  }
+  const inner = (url && url.trim())
+    ? `<img src="${url}" alt="Foto ${photo.year} - ${photo.theme}">`
+    : placeholderSvg(state.current + 1);
+  // wrap rond foto zodat we het 10x10 raster eroverheen kunnen leggen
+  slot.innerHTML = `<div class="photo-wrap">${inner}${buildRevealGrid()}</div>`;
+  startReveal(10);
   photo._opts = {
     theme: buildOptions("theme", photo.theme),
     year:  buildOptions("year",  photo.year),
