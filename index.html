@@ -1554,6 +1554,7 @@ const state = {
   elapsedMs: 0,
   timerInterval: null,
   tickInterval: null,
+  processing: false,   // true tussen een juist antwoord en het laden van de volgende foto
 };
 // ============================================================
 //  HELPERS
@@ -1660,6 +1661,8 @@ function showPhoto() {
 //  CONTROLEREN
 // ============================================================
 function check() {
+  // anti-cheat: negeer extra klikken zolang een juist antwoord nog verwerkt wordt
+  if (state.processing) return;
   const sel = state.selections;
   if (sel.theme == null || sel.year == null || sel.place == null) {
     $("#feedback").textContent = "Kies in elke rij een antwoord.";
@@ -1682,10 +1685,16 @@ function check() {
     }
   }
   if (ok.theme && ok.year && ok.place) {
+    state.processing = true;
+    $("#btn-check").disabled = true;
     $("#feedback").textContent = "Juist! Op naar de volgende.";
     $("#feedback").className = "feedback good";
     playTing();
-    setTimeout(nextPhoto, 600);
+    setTimeout(() => {
+      state.processing = false;
+      $("#btn-check").disabled = false;
+      nextPhoto();
+    }, 600);
   } else {
     $("#feedback").textContent = "Nog niet alles juist — pas je antwoord aan.";
     $("#feedback").className = "feedback bad";
@@ -1788,6 +1797,9 @@ function startGame() {
   document.querySelectorAll(".options").forEach(o => (o.innerHTML = ""));
   $("#feedback").textContent = "";
   $("#feedback").className = "feedback";
+  // anti-cheat-vlag resetten + knop weer actief
+  state.processing = false;
+  $("#btn-check").disabled = false;
 
   // eerst nieuwe inhoud klaarzetten in het (nog verborgen) spelscherm,
   // pas daarna zichtbaar maken — voorkomt een flits met de vorige vraag
@@ -2098,9 +2110,18 @@ function openAdmin() {
   renderAdminList();
 }
 $("#admin-refresh").addEventListener("click", renderAdminList);
-$("#admin-back").addEventListener("click", () => { location.search = ""; });
+$("#admin-back").addEventListener("click", () => {
+  // verwijder zowel ?admin als #admin uit URL en herlaad
+  const cleanUrl = location.origin + location.pathname;
+  location.replace(cleanUrl);
+});
 
-const isAdmin = new URLSearchParams(location.search).has("admin");
+// admin-modus zowel via ?admin als #admin (sommige hostings of typfouten geven
+// 404 bij querystrings, hash werkt altijd)
+const isAdmin =
+  new URLSearchParams(location.search).has("admin") ||
+  /(^|[?&])admin(=|$|&)/.test(location.search) ||
+  /(^|#)admin(\b|$)/.test(location.hash);
 if (isAdmin) {
   openAdmin();
 } else {
